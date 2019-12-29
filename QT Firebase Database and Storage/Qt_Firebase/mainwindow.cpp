@@ -6,8 +6,10 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <mystorage.h>
+#include <myfirebasemanager.h>
 
 #define PROJECT_ID "mama-menage"
+#define PATH_USERS "users"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +20,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(myStorage, SIGNAL(progressChanged(qint64,qint64,int)), this, SLOT(onProgressChanged(qint64,qint64,int)));
     connect(myStorage, SIGNAL(done()), this, SLOT(onDone()));
 
+    myFirebaseManager = new MyFirebaseManager("https://" PROJECT_ID ".firebaseio.com/");
+    myFirebaseManager->update();
+    connect(myFirebaseManager, SIGNAL(dataIsReady()), this, SLOT(dataIsReady()));
+    ui->tableWidget->setColumnCount(2);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "User Name"<<"Password");
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+
 }
 
 MainWindow::~MainWindow()
@@ -25,7 +34,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+//--------------------------Storage
+
+void MainWindow::on_pushButton_upload_clicked()
 {
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Images (*.png)"));
@@ -35,9 +46,6 @@ void MainWindow::on_pushButton_clicked()
                                                    tr("Images (*.png)"));
     qDebug() << filePath ;
     myStorage->uploadImage(filePath);
-
-
-
 }
 
 void MainWindow::onProgressChanged(qint64 bytesSent, qint64 bytesTotal, int percentage)
@@ -51,3 +59,26 @@ void MainWindow::onDone()
 }
 
 
+//--------------------------Database
+
+void MainWindow::on_pushButton_add_clicked()
+{
+    myFirebaseManager->setValue(PATH_USERS, ui->lineEdit_user_name->text(), ui->lineEdit_password->text());
+}
+
+void MainWindow::dataIsReady()
+{
+
+    qDebug() << Q_FUNC_INFO ;
+    QJsonObject json = myFirebaseManager->getChild(PATH_USERS);
+    qDebug() << json;
+    ui->tableWidget->setRowCount(0);
+     foreach(const QString& key, json.keys()) {
+        QJsonValue value = json.value(key);
+        qDebug() << "Key = " << key << ", Value = " << value.toString();
+        int row = ui->tableWidget->rowCount() ;
+        ui->tableWidget->setRowCount(row+1);
+         ui->tableWidget->setItem(row, 0, new QTableWidgetItem(key));
+         ui->tableWidget->setItem(row, 1, new QTableWidgetItem( value.toString()));
+    }
+}

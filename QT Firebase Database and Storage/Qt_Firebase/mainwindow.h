@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <myfirebasemanager.h>
 #include <mystorage.h>
 
 namespace Ui {
@@ -18,13 +19,18 @@ public:
 
 
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_upload_clicked();
     void onProgressChanged(qint64 bytesSent, qint64 bytesTotal, int percentage);
     void onDone();
 
+
+    void on_pushButton_add_clicked();
+
+    void dataIsReady();
 private:
     Ui::MainWindow *ui;
     MyStorage *myStorage;
+    MyFirebaseManager *myFirebaseManager;
 };
 
 #endif // MAINWINDOW_H
