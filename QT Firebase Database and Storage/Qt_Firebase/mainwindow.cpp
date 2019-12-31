@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     myStorage = new MyStorage(this, PROJECT_ID);
     connect(myStorage, SIGNAL(progressChanged(qint64,qint64,int)), this, SLOT(onProgressChanged(qint64,qint64,int)));
     connect(myStorage, SIGNAL(done()), this, SLOT(onDone()));
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     myFirebaseManager = new MyFirebaseManager("https://" PROJECT_ID ".firebaseio.com/");
     myFirebaseManager->update();
     connect(myFirebaseManager, SIGNAL(dataIsReady()), this, SLOT(dataIsReady()));
+
+
     ui->tableWidget->setColumnCount(2);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "User Name"<<"Password");
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
