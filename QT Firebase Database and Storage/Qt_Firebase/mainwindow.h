@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "firebase_models.h"
+
 #include <QMainWindow>
 #include <myfirebasemanager.h>
 #include <mystorage.h>
@@ -31,6 +33,9 @@ private:
     Ui::MainWindow *ui;
     MyStorage *myStorage;
     MyFirebaseManager *myFirebaseManager;
+    QList<Row_User> users ;
+    QList<Row_Product> products ;
+
 };
 
 #endif // MAINWINDOW_H

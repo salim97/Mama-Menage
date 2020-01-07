@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "User Name"<<"Password");
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
+
 }
 
 MainWindow::~MainWindow()
@@ -68,16 +69,13 @@ void MainWindow::onDone()
 void MainWindow::on_pushButton_add_clicked()
 {
     Row_User row_User ;
-    row_User.id = "01" ;
-    row_User.name="salim123" ;
+    row_User.name="dfgdf" ;
     row_User.password="123456" ;
     row_User.address="oran" ;
     myFirebaseManager->setValue(PATH_USERS,row_User.toJSON());
 
     Row_Product row_Product ;
-     row_Product.id = "01" ;
-    row_Product.name="salim" ;
-
+    row_Product.name="profddgfduit01" ;
     row_Product.quantite=1 ;
     row_Product.price=300 ;
     myFirebaseManager->setValue(PATH_PRODUCTS, row_Product.toJSON());
@@ -85,12 +83,11 @@ void MainWindow::on_pushButton_add_clicked()
 
 
     Facture facture ;
-     facture.id = "01" ;
     facture.products.append(row_Product);
     facture.products.append(row_Product);
     facture.products.append(row_Product);
     facture.user = row_User;
-    qDebug() << row_User.toJSON() ;
+
     myFirebaseManager->setValue(PATH_FACTURES,facture.toJSON());
 
 
@@ -101,18 +98,28 @@ void MainWindow::on_pushButton_add_clicked()
 void MainWindow::dataIsReady()
 {
 
-    //qDebug() << Q_FUNC_INFO ;
-    QJsonObject json = myFirebaseManager->getChild(PATH_USERS);
-    //qDebug() << json;
-    ui->tableWidget->setRowCount(0);
-     foreach(const QString& key, json.keys()) {
+    QJsonObject json;
+    json = myFirebaseManager->getChild(PATH_USERS);
+    users.clear();
+    foreach(const QString& key, json.keys()) {
         QJsonValue value = json.value(key);
-       // qDebug() << "Key = " << key << ", Value = " << value.toString();
-        int row = ui->tableWidget->rowCount() ;
-        ui->tableWidget->setRowCount(row+1);
-         ui->tableWidget->setItem(row, 0, new QTableWidgetItem(key));
-         ui->tableWidget->setItem(row, 1, new QTableWidgetItem( value.toString()));
+        Row_User row_User ;
+        row_User.fromJSON(value.toObject());
+        users.append(row_User);
     }
+
+    json = myFirebaseManager->getChild(PATH_PRODUCTS);
+    products.clear();
+    foreach(const QString& key, json.keys()) {
+        QJsonValue value = json.value(key);
+        Row_Product row_Product ;
+        row_Product.fromJSON(value.toObject());
+        products.append(row_Product);
+    }
+
+    qDebug() << Q_FUNC_INFO;
+    qDebug() << "users.length() =" << users.length() ;
+    qDebug() << "products.length() =" << products.length() ;
 
 
 }
