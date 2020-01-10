@@ -23,11 +23,10 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+myAppState = Provider.of<MyAppState>(context, listen: false);
     Future.delayed(Duration.zero).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
-        myAppState = Provider.of<MyAppState>(context);
       });
     });
   }
@@ -68,7 +67,8 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
             Positioned(
               top: 0,
               left: 0,
-              height: windowsSize.height * 0.8,
+           
+              height: windowsSize.height * 0.7,
               width: windowsSize.width,
               child: ListView.builder(
                 itemCount: myAppState.selectedProducts.length,

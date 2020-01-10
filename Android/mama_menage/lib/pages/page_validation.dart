@@ -31,7 +31,7 @@ class _Page_ValidationState extends State<Page_Validation> {
     String textOutput = "";
     textOutput += "Commande numero XX \n";
     myAppState.selectedProducts?.forEach((p) {
-      if (!p.checked) {
+      if (p.checked) {
         textOutput += "\nproduct name = " + p.name;
         textOutput += "\nproduct cost = " + p.cost.toString();
         textOutput += "\nproduct quantity = " + p.quantity.toString();

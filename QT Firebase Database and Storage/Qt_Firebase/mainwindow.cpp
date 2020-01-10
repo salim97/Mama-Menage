@@ -1,3 +1,4 @@
+#include "dialogproducts.h"
 #include "firebase_models.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -68,27 +69,66 @@ void MainWindow::onDone()
 
 void MainWindow::on_pushButton_add_clicked()
 {
-    Row_User row_User ;
-    row_User.name="dfgdf" ;
-    row_User.password="123456" ;
-    row_User.address="oran" ;
-    myFirebaseManager->setValue(PATH_USERS,row_User.toJSON());
 
-    Row_Product row_Product ;
-    row_Product.name="profddgfduit01" ;
-    row_Product.quantite=1 ;
-    row_Product.price=300 ;
-    myFirebaseManager->setValue(PATH_PRODUCTS, row_Product.toJSON());
+    QString basePath = "d://Archive//GITHUB//SUDO-DEV//Mama-Menage//Android//mama_menage//assets//images//";
+
+    QList<Row_Product> row_Product ;
+    row_Product.append(Row_Product("shoes6", 10, 300, basePath+"shoes6.jpeg"));
+    row_Product.append(Row_Product("clothes1", 15, 900, basePath+"clothes1.jpg"));
+    row_Product.append(Row_Product("furniture1", 5, 800, basePath+"furniture1.jpg"));
+    row_Product.append(Row_Product("shoes1", 25, 1200, basePath+"shoes1.jpg"));
+    qDebug() << "Start uploading..." ;
+    DialogProducts dialogProducts(PROJECT_ID) ;
+    QNetworkReply::NetworkError replay = dialogProducts.uploadProducts(row_Product);
+    if(replay == QNetworkReply::NoError)
+    {
+        qDebug() << "done" ;
+    }
+    else
+    {
+        qDebug() << replay ;
+    }
+
+    return ;
+    //    Row_User row_User ;
+    //    row_User.name="dfgdf" ;
+    //    row_User.password="123456" ;
+    //    row_User.address="oran" ;
+    //    myFirebaseManager->setValue(PATH_USERS,row_User.toJSON());
+
+    //    {
+    //        Row_Product row_Product ;
+    //        row_Product.name="clothes1" ;
+    //        row_Product.quantite=8 ;
+    //        row_Product.price=300 ;
+    //        myFirebaseManager->setValue(PATH_PRODUCTS, row_Product.toJSON());
+    //    }
+
+    //    {
+    //        Row_Product row_Product ;
+    //        row_Product.name="clothes1" ;
+    //        row_Product.quantite=8 ;
+    //        row_Product.price=300 ;
+    //        row_Product.price=300 ;
+
+    //        myFirebaseManager->setValue(PATH_PRODUCTS, row_Product.toJSON());
+    //    }
 
 
+    //        Row_Product row_Product ;
+    //        row_Product.name="clothes1" ;
+    //        row_Product.quantite=8 ;
+    //        row_Product.price=300 ;
+    //        myFirebaseManager->setValue(PATH_PRODUCTS, row_Product.toJSON());
 
-    Facture facture ;
-    facture.products.append(row_Product);
-    facture.products.append(row_Product);
-    facture.products.append(row_Product);
-    facture.user = row_User;
 
-    myFirebaseManager->setValue(PATH_FACTURES,facture.toJSON());
+    //    Facture facture ;
+    //    facture.products.append(row_Product);
+    //    facture.products.append(row_Product);
+    //    facture.products.append(row_Product);
+    //    facture.user = row_User;
+
+    //    myFirebaseManager->setValue(PATH_FACTURES,facture.toJSON());
 
 
 

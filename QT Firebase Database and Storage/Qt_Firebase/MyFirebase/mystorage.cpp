@@ -14,7 +14,7 @@ MyStorage::MyStorage(QObject *parent, QString PROJECT_ID) : QObject(parent)
 }
 
 
-bool MyStorage::uploadImage(QString imagePath, QString fileName)
+QString MyStorage::uploadImage(QString imagePath, QString fileName)
 {
 
     QFile file(imagePath);
@@ -25,9 +25,9 @@ bool MyStorage::uploadImage(QString imagePath, QString fileName)
     dataToSend = file.readAll();
     QString url ;
     if(fileName.isEmpty())
-        url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o?uploadType=media&name="+imagePath.split("/").last();
-    else
-        url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o?uploadType=media&name="+fileName;
+        fileName = imagePath.split("/").last() ;
+
+    url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o?uploadType=media&name="+fileName;
 
     QNetworkRequest *request = new QNetworkRequest(QUrl(url));
     request->setRawHeader("Content-Type","image/png");
@@ -36,6 +36,9 @@ bool MyStorage::uploadImage(QString imagePath, QString fileName)
     QNetworkReply *reply = networkAccessManager->post(*request,dataToSend);
     connect(reply, SIGNAL(finished()), this, SLOT(onDone()));
     connect(reply, SIGNAL(uploadProgress(qint64, qint64)), SLOT(progressChanged(qint64, qint64)));
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), SLOT(onError(QNetworkReply::NetworkError)));
+
+    return fileName ;
 }
 
 void MyStorage::progressChanged(qint64 bytesSent, qint64 bytesTotal)
@@ -47,4 +50,9 @@ void MyStorage::progressChanged(qint64 bytesSent, qint64 bytesTotal)
 void MyStorage::onDone()
 {
     emit done() ;
+}
+
+void MyStorage::onError(QNetworkReply::NetworkError networkError)
+{
+    emit error(networkError) ;
 }

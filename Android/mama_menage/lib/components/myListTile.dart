@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
@@ -31,7 +32,7 @@ class _MyListTileState extends State<MyListTile> {
     final height = windowsSize.width / (landscape ? 4.8 : 3.5);
     final SPACE_ROW_QUANTITY = 10.0;
     final SPACE_COLUMN_TEXT = landscape ? 20.0 : 5.0;
-    
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -47,7 +48,18 @@ class _MyListTileState extends State<MyListTile> {
                 myAppState.notifyListeners();
               },
             ),
-            Image.asset(product.imagePath, fit: BoxFit.fill, height: height, width: height),
+            DEV_MODE
+                ? Image.asset(product.imagePath, fit: BoxFit.fill, height: height, width: height)
+                : Image.network(product.imagePath, fit: BoxFit.fill, height: height, width: height)
+                // CachedNetworkImage(
+                //     imageUrl: product.imagePath,
+                //     fit: BoxFit.fill,
+                //     height: height,
+                //     width: height,
+                //     placeholder: (context, url) => CircularProgressIndicator(),
+                //     errorWidget: (context, url, error) => Icon(Icons.error),
+                //   )
+                  ,
             Expanded(
               flex: 3,
               child: Column(
@@ -61,7 +73,7 @@ class _MyListTileState extends State<MyListTile> {
                     height: SPACE_COLUMN_TEXT,
                   ),
                   Text(
-                    (product.cost * product.quantity).toStringAsFixed(2) + " DA",
+                    product.cost.toStringAsFixed(2) + " DA",
                     style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                   ),
                   Expanded(
@@ -74,12 +86,13 @@ class _MyListTileState extends State<MyListTile> {
                         child: Container(),
                       ),
                       FloatingActionButton(
+                        heroTag: product.name+"++",
                         mini: true,
                         child: Icon(MdiIcons.minus),
                         onPressed: () {
-                          if (product.quantity > 1)
+                          if (product.selectedQuantity > 1)
                             setState(() {
-                              product.quantity--;
+                              product.selectedQuantity--;
                             });
                           myAppState.notifyListeners();
                         },
@@ -88,18 +101,20 @@ class _MyListTileState extends State<MyListTile> {
                         width: SPACE_ROW_QUANTITY,
                       ),
                       Text(
-                        product.quantity.toString(),
+                        product.selectedQuantity.toString(),
                         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         width: SPACE_ROW_QUANTITY,
                       ),
                       FloatingActionButton(
+                         heroTag: product.name+"--",
                         mini: true,
                         child: Icon(MdiIcons.plus),
                         onPressed: () {
+                          if(product.selectedQuantity < product.quantity) 
                           setState(() {
-                            product.quantity++;
+                            product.selectedQuantity++;
                           });
                           myAppState.notifyListeners();
                         },

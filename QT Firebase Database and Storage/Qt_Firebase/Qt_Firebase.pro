@@ -29,14 +29,17 @@ include(MyFirebase/MyFirebase.pri)
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    dialogproducts.cpp
 
 HEADERS += \
         mainwindow.h \
-    firebase_models.h
+    firebase_models.h \
+    dialogproducts.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    dialogproducts.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

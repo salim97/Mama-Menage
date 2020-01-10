@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'page_all_products.dart';
 
 class Page_Login extends StatefulWidget {
   @override
@@ -17,16 +20,20 @@ class _Page_LoginState extends State<Page_Login> {
     // TODO: implement initState
     super.initState();
 
+    myAppState = Provider.of<MyAppState>(context, listen: false);
     Future.delayed(Duration(milliseconds: 100)).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
-        myAppState = Provider.of<MyAppState>(context);
       });
-      myAppState.signInAnonymously();
-    });
-    if (DEV_MODE) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
-        emailController.text = "salim";
+        //emailController.text = (prefs.getString('userName') ?? "");
+      });
+    });
+    // if (DEV_MODE) 
+    {
+      setState(() {
+        emailController.text = "salim123";
         passwordController.text = "123456";
       });
     }
@@ -43,16 +50,16 @@ class _Page_LoginState extends State<Page_Login> {
           color: Colors.orange);
       return;
     }
-    DataSnapshot snapshot = await myAppState.databaseReferenceUsers.once();
-    print('Data : ${snapshot.value}');
-    Map<dynamic, dynamic> mapResponse = snapshot.value;
-
-    bool userFound = false;
-    mapResponse?.forEach((key, value) {
-      if (key == userName && value == password) userFound = true;
-    });
+    bool userFound = await myAppState.login(email: userName, password: password);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userName', userName);
     if (userFound) {
+      setState(() {
+        passwordController.text = "";
+      });
       myAppState.flushbar(context: context, message: "login successfully", color: Colors.green);
+        Navigator.of(context)
+                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
     } else {
       myAppState.flushbar(context: context, message: "failed to login", color: Colors.red);
     }
@@ -61,6 +68,7 @@ class _Page_LoginState extends State<Page_Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _isPasswordHidden = true;
+  bool visiblelogin = true;
   @override
   Widget build(BuildContext context) {
     windowsSize = MediaQuery.of(context).size;
@@ -170,20 +178,28 @@ class _Page_LoginState extends State<Page_Login> {
                       //     ),
                       //   ),
                       InkWell(
-                        onTap: () {
-                          login();
+                        onTap: () async {
+                          setState(() {
+                            visiblelogin = false;
+                          });
+                          await login();
+                          setState(() {
+                            visiblelogin = true;
+                          });
                         },
-                        child: Container(
-                          height: 50,
-                          width: windowsSize.width / 3,
-                          decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(50)),
-                          margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
-                          child: Center(
-                              child: Text(
-                            'Login',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          )),
-                        ),
+                        child: visiblelogin
+                            ? Container(
+                                height: 50,
+                                width: windowsSize.width / 3,
+                                decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(50)),
+                                margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                child: Center(
+                                    child: Text(
+                                  'Login',
+                                  style: TextStyle(fontSize: 16, color: Colors.white),
+                                )),
+                              )
+                            : CircularProgressIndicator(),
                       ),
                       SizedBox(
                         height: 10,

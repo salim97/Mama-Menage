@@ -46,8 +46,21 @@ public:
 
 class Row_Product{
 public:
-    QString name, image_path;
-    int quantite, price ;
+    QString name, image_local_path, image_remote_path;
+    int quantite = 0, price = 0 ;
+    Row_Product(QString name, int quantite, int price, QString image_local_path, QString image_remote_path = "")
+    {
+        this->name = name;
+        this->quantite = quantite;
+        this->price = price;
+        this->image_local_path = image_local_path;
+        this->image_remote_path = image_remote_path;
+    }
+
+    Row_Product()
+    {
+    }
+
     QJsonObject toJSON()
     {
         QJsonObject recordObject;
@@ -55,7 +68,8 @@ public:
         addressObject.insert("name", name);
         addressObject.insert("quantite", quantite);
         addressObject.insert("price", price);
-        addressObject.insert("image_path", image_path);
+        addressObject.insert("image_local_path", image_local_path);
+        addressObject.insert("image_remote_path", image_remote_path);
         recordObject.insert(getUniqID(), addressObject);
         return recordObject;
     }
@@ -71,7 +85,8 @@ public:
             if(key == "name") name = value.toString();
             if(key == "quantite") quantite = value.toInt();
             if(key == "price") price = value.toInt();
-            if(key == "image_path") image_path = value.toString();
+            if(key == "image_local_path") image_local_path = value.toString();
+            if(key == "image_remote_path") image_remote_path = value.toString();
         }
         return true ;
     }
@@ -103,7 +118,6 @@ public:
         //recordObject.insert(id, addressObject);
         return recordObject;
     }
-
 
 };
 
