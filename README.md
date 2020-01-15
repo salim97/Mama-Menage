@@ -4,17 +4,7 @@
 
 # Current Status of MyFirebase
 
-- Clients && Users
-    + [X] Create
-    + [X] Read 
-    + [X] Write
-
-- Products
-    + [X] Create
-    + [X] Read 
-    + [X] Write
-    
-- Factures
+- Clients, Users, Products, Factures
     + [X] Create
     + [X] Read 
     + [X] Write
