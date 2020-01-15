@@ -1,8 +1,6 @@
 # Mama-Menage
 
-# QT
-
-# Current Status of MyFirebase
+# Current Status of Qt MyFirebase library
 
 - Clients, Users, Products, Factures
     + [X] Create
@@ -16,7 +14,7 @@
     + [X] Async Read
     + [X] Sync Read 
 
-# FLUTTER
+# Current Status of FLUTTER Android Application
 
 - APP
     + [X] Logic
