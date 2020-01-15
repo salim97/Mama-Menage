@@ -8,13 +8,16 @@ class CardItems extends StatelessWidget {
   final String image;
   final String name;
   final num cost;
-  final Function onPress;
+  final bool isPriceVisible ;
+  
+  final Function onPress, onLongPress;
 
-  CardItems({@required this.image, @required this.name, @required this.cost, this.onPress});
+  CardItems({@required this.image, @required this.name, @required this.cost, this.onPress, this.onLongPress, this.isPriceVisible});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onPress,
+      onLongPress: onLongPress,
       child: Container(
         margin: EdgeInsets.all(10),
         width: 100,
@@ -25,9 +28,7 @@ class CardItems extends StatelessWidget {
             image: DecorationImage(
               image: DEV_MODE
                   ? AssetImage(image)
-                  : CachedNetworkImageProvider(
-                      image,
-                    ),
+                  : CachedNetworkImageProvider(image),
             )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,13 +53,13 @@ class CardItems extends StatelessWidget {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                     ),
                   ),
-                  Padding(
+                   isPriceVisible ?Padding(
                     padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
                     child: Text(
                       '$cost DA',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                  ),
+                  ) : Container(),
                 ],
               ),
             ),

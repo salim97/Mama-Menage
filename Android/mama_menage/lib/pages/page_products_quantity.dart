@@ -32,6 +32,7 @@ myAppState = Provider.of<MyAppState>(context, listen: false);
   }
 
   valider() async {
+    await myAppState.saveFatures();
      Navigator.of(context)
                       .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Validation()));
   }
@@ -103,8 +104,8 @@ myAppState = Provider.of<MyAppState>(context, listen: false);
                       Expanded(
                         child: Container(),
                       ),
-                      Text(myAppState.totalCostSelectedProducts.toString() + " DA",
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      myAppState.user.isPriceVisible ? Text(myAppState.totalCostSelectedProducts.toString() + " DA",
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)): Container(),
                       SizedBox(
                         width: 10.0,
                       ),

@@ -33,7 +33,7 @@ class _Page_LoginState extends State<Page_Login> {
     // if (DEV_MODE) 
     {
       setState(() {
-        emailController.text = "salim123";
+        emailController.text = "salim";
         passwordController.text = "123456";
       });
     }
@@ -53,13 +53,11 @@ class _Page_LoginState extends State<Page_Login> {
     bool userFound = await myAppState.login(email: userName, password: password);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('userName', userName);
-    if (userFound) {
-      setState(() {
-        passwordController.text = "";
-      });
+    if (userFound ) {
+      
       myAppState.flushbar(context: context, message: "login successfully", color: Colors.green);
-        Navigator.of(context)
-                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
+        // Navigator.of(context)
+                      // .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
     } else {
       myAppState.flushbar(context: context, message: "failed to login", color: Colors.red);
     }
@@ -183,6 +181,7 @@ class _Page_LoginState extends State<Page_Login> {
                             visiblelogin = false;
                           });
                           await login();
+                          if(mounted)
                           setState(() {
                             visiblelogin = true;
                           });

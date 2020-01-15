@@ -66,6 +66,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton_check">
+              <property name="text">
+               <string>check if everything is ok</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -116,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>643</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

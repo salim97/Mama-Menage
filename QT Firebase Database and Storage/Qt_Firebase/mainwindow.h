@@ -29,6 +29,8 @@ private slots:
     void on_pushButton_add_clicked();
 
     void dataIsReady();
+    void on_pushButton_check_clicked();
+
 private:
     Ui::MainWindow *ui;
     MyStorage *myStorage;

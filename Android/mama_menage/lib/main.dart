@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'mainwindow.dart';
 import 'pages/page_all_products.dart';
 import 'pages/page_login.dart';
 import 'pages/page_products_details.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.green,
         ),
-        home: Page_Login(),
+        home: MainWindow(),
         // home: Page_AllProdutcs(),
       ),
     );

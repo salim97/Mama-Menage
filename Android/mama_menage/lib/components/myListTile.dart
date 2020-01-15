@@ -49,16 +49,16 @@ class _MyListTileState extends State<MyListTile> {
               },
             ),
             DEV_MODE
-                ? Image.asset(product.imagePath, fit: BoxFit.fill, height: height, width: height)
-                : Image.network(product.imagePath, fit: BoxFit.fill, height: height, width: height)
-                // CachedNetworkImage(
-                //     imageUrl: product.imagePath,
-                //     fit: BoxFit.fill,
-                //     height: height,
-                //     width: height,
-                //     placeholder: (context, url) => CircularProgressIndicator(),
-                //     errorWidget: (context, url, error) => Icon(Icons.error),
-                //   )
+                ? Image.asset(product.imagePath.first, fit: BoxFit.fill, height: height, width: height)
+                // : Image.network(product.imagePath.first, fit: BoxFit.fill, height: height, width: height)
+                :CachedNetworkImage(
+                    imageUrl: product.imagePath.first,
+                    fit: BoxFit.fill,
+                    height: height,
+                    width: height,
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  )
                   ,
             Expanded(
               flex: 3,
@@ -72,10 +72,11 @@ class _MyListTileState extends State<MyListTile> {
                   SizedBox(
                     height: SPACE_COLUMN_TEXT,
                   ),
+                  myAppState.user.isPriceVisible ?
                   Text(
                     product.cost.toStringAsFixed(2) + " DA",
                     style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                  ),
+                  ): Container() ,
                   Expanded(
                     child: Container(),
                   ),

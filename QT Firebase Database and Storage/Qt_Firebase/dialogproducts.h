@@ -33,6 +33,7 @@ private:
     QEventLoop *waitForFileToBeUploaded, *waitForDataToBeWriten;
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
     QList<Row_Product> replayProducts ;
+     QTimer *request_timer;
 };
 
 #endif // DIALOGPRODUCTS_H

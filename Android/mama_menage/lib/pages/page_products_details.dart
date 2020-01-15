@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:mama_menage/components/myListTile.dart';
@@ -11,7 +12,7 @@ import 'page_products_quantity.dart';
 
 class Page_Products_Details extends StatefulWidget {
   int index;
-  Page_Products_Details({Key key, this.index = 1}) : super(key: key);
+  Page_Products_Details({Key key, this.index = -1}) : super(key: key);
 
   @override
   _Page_Products_DetailsState createState() => _Page_Products_DetailsState();
@@ -27,6 +28,7 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
+    _textEditingController.text = product.detail ;
     Future.delayed(Duration.zero).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
@@ -46,22 +48,11 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
         appBar: AppBar(
           title: Text(product.name),
           actions: <Widget>[
-            Badge(
-              position: BadgePosition.topRight(top: 0, right: 3),
-              animationDuration: Duration(milliseconds: 300),
-              animationType: BadgeAnimationType.slide,
-              badgeContent: Text(
-                myAppState.selectedProducts.length.toString(),
-                style: TextStyle(color: Colors.white),
-              ),
-              child: IconButton(
-                  icon: Icon(Icons.shopping_cart,
-                      color: myAppState.selectedProducts.length == 0 ? Colors.white : Colors.orange),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Products_Quantity()));
-                  }),
-            )
+            IconButton(
+                icon: Icon(Icons.add, color: Colors.white),
+                onPressed: () {
+                  // add
+                })
           ],
         ),
         body: Padding(
@@ -71,9 +62,9 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
               child: Wrap(
                 direction: landscape ? Axis.vertical : Axis.horizontal,
                 children: <Widget>[
-                   SizedBox(
-                    height: longSize/2,
-                    width: longSize/2,
+                  SizedBox(
+                    height: longSize / 2,
+                    width: longSize / 2,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -100,7 +91,6 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                           //   ExactAssetImage("assets/images/LaunchImage.jpg")
                           // ],
                           )),
-                 
                 ],
               ),
             ),
@@ -112,13 +102,28 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     final longSize = landscape ? windowsSize.width : windowsSize.height;
     List<Widget> images = new List<Widget>();
-    myAppState.selectedProducts.forEach((p) {
+    product.imagePath.forEach((p) {
       images.add(Builder(
         builder: (BuildContext context) {
-          return Image.asset(
-            p.imagePath,
-            fit: BoxFit.fill,
-          );
+          return DEV_MODE
+              ? Image.asset(
+                  p,
+                  fit: BoxFit.fill,
+                )
+              // : Image.network(
+              //     p,
+              //     fit: BoxFit.fill,
+              //   )
+              :CachedNetworkImage(
+                    imageUrl: p,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  )
+                ;
         },
       ));
     });

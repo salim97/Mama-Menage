@@ -5,6 +5,7 @@ import 'package:mama_menage/components/card_categories.dart';
 import 'package:mama_menage/components/card_items.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/pages/page_login.dart';
+import 'package:mama_menage/pages/page_products_details.dart';
 import 'package:mama_menage/pages/page_validation.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
@@ -13,11 +14,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'page_products_quantity.dart';
 
 final Color inactiveColor = Color(0xffc2c2c2);
-enum filterProduct {
-  names,
-  prices,
-  quantite,
-}
+enum filterProduct { names, prices, quantite, date }
 
 class Page_AllProdutcs extends StatefulWidget {
   const Page_AllProdutcs({Key key}) : super(key: key);
@@ -36,7 +33,8 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
-    readProducts();
+    onRefresh();
+    //_refreshController
     Future.delayed(Duration(milliseconds: 100)).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
@@ -45,42 +43,14 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     });
   }
 
-  readProducts() async {
-    print("readProducts() async {");
-    if (myAppState.databaseReferenceProducts == null) await myAppState.signInAnonymously();
-    DataSnapshot snapshot = await myAppState.databaseReferenceProducts.once();
-    print('Data : ${snapshot.value}');
-    await myAppState.mapToProducts(snapshot.value);
+  onRefresh() async {
+    if (myAppState.database == null) await myAppState.signInAnonymously();
+    await myAppState.getAllProducts();
     setState(() {
       _products.clear();
       myAppState.products.forEach((p) => _products.add(p));
     });
   }
-
-  final c_nameController = TextEditingController();
-
-  List<ModelProduct> _products = List<ModelProduct>();
-  onApplyFilter() async {
-    setState(() {
-      _products.clear();
-      myAppState.products.forEach((p) {
-        if (c_nameController.text.isEmpty)
-          _products.add(p);
-        else if (p.name.contains(c_nameController.text)) _products.add(p);
-      });
-    });
-  }
-
-  onSignOut() async {
-            // Navigator.of(context)
-            //           .pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => new Page_Login()));
-    
-        final landscape = windowsSize.width > windowsSize.height ? true : false;
-        if(!landscape) Navigator.of(context).pop();
-    Navigator.of(context).pop();
-  }
-
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
@@ -97,12 +67,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
         body: Stack(
           children: <Widget>[
             Positioned(
-              left: 0,
-              top: 0,
-              width: windowsSize.width - drawerWidth,
-              height: windowsSize.height,
-              child:body()
-            ),
+                left: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
             Positioned(top: 0, right: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
           ],
         ),
@@ -112,14 +77,19 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   }
 
   Widget appBar() {
-        final drawerWidth = windowsSize.width * 0.25;
+    final drawerWidth = windowsSize.width * 0.25;
     final double itemHeight = (windowsSize.height - kToolbarHeight - 150) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     return AppBar(
       title: Text('LOGO'),
-      leading: Container(),
       actions: <Widget>[
+        IconButton(
+            icon: Icon(Icons.restore_from_trash, color: Colors.white),
+            onPressed: () {
+              myAppState.selectedProducts.clear();
+              myAppState.notifyListeners();
+            }),
         Badge(
           position: BadgePosition.topRight(top: 0, right: 3),
           animationDuration: Duration(milliseconds: 300),
@@ -132,6 +102,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
               icon: Icon(Icons.shopping_cart,
                   color: myAppState.selectedProducts.length == 0 ? Colors.white : Colors.orange),
               onPressed: () {
+                if (myAppState.selectedProducts.length == 0) return;
                 Navigator.of(context)
                     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Products_Quantity()));
               }),
@@ -140,8 +111,10 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     );
   }
 
+  RefreshController _refreshController = RefreshController(initialRefresh: true);
+
   Widget body() {
-        final drawerWidth = windowsSize.width * 0.25;
+    final drawerWidth = windowsSize.width * 0.25;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     final double itemHeight = (windowsSize.height - kToolbarHeight - (landscape ? 60 : 150)) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
@@ -155,8 +128,8 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
       header: WaterDropHeader(),
       onRefresh: () async {
         //monitor fetch data from network
-        await readProducts();
-        if (mounted) setState(() {});
+        await onRefresh();
+
         _refreshController.refreshCompleted();
       },
       onLoading: () async {
@@ -179,18 +152,23 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
                     return CardItems(
-                      image: _products.elementAt(index).imagePath,
+                      image: _products.elementAt(index).imagePath.first,
                       name: _products.elementAt(index).name,
                       cost: _products.elementAt(index).cost,
+                      isPriceVisible: myAppState.user.isPriceVisible,
                       onPress: () {
-                        for(int i = 0 ; i < myAppState.selectedProducts.length ; i++)
-                        {
-                          if(_products.elementAt(index).name == myAppState.selectedProducts.elementAt(i).name)
-                            return ;
+                        for (int i = 0; i < myAppState.selectedProducts.length; i++) {
+                          if (_products.elementAt(index).name == myAppState.selectedProducts.elementAt(i).name) return;
                         }
                         myAppState.selectedProducts.add(_products.elementAt(index));
-                     
+
                         myAppState.notifyListeners();
+                      },
+                      onLongPress: () {
+                        Navigator.of(context).push(new MaterialPageRoute(
+                            builder: (BuildContext context) => new Page_Products_Details(
+                                  index: index,
+                                )));
                       },
                     );
                   }),
@@ -199,6 +177,24 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
         ],
       ),
     );
+  }
+
+  final c_nameController = TextEditingController();
+
+  List<ModelProduct> _products = List<ModelProduct>();
+  onApplyFilter() async {
+    setState(() {
+      _products.clear();
+      myAppState.products.forEach((p) {
+        if (c_nameController.text.isEmpty)
+          _products.add(p);
+        else if (p.name.contains(c_nameController.text)) _products.add(p);
+      });
+      if (category == filterProduct.names) _products.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toLowerCase()));
+      if (category == filterProduct.date) _products.sort((a, b) => a.createdAt.toUpperCase().compareTo(b.createdAt.toLowerCase()));
+      if (category == filterProduct.prices) _products.sort((a, b) => a.cost.compareTo( b.cost ));
+      if (category == filterProduct.quantite) _products.sort((a, b) =>  a.quantity.compareTo( b.quantity ));
+    });
   }
 
   Widget filterPage() {
@@ -253,6 +249,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                               setState(() {
                                 category = filterProduct.names;
                               });
+                              onApplyFilter();
                             },
                             cardColour: category == filterProduct.names ? inactiveColor : Colors.white,
                             textColor: category == filterProduct.names ? Colors.black : inactiveColor,
@@ -260,15 +257,17 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                         SizedBox(
                           width: 10,
                         ),
+                        myAppState.user.isPriceVisible ? 
                         CardCategories(
                             onPress: () {
                               setState(() {
                                 category = filterProduct.prices;
                               });
+                              onApplyFilter();
                             },
                             cardColour: category == filterProduct.prices ? inactiveColor : Colors.white,
                             textColor: category == filterProduct.prices ? Colors.black : inactiveColor,
-                            text: "Price"),
+                            text: "Price") : Container(),
                         SizedBox(
                           width: 10,
                         ),
@@ -277,10 +276,21 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                               setState(() {
                                 category = filterProduct.quantite;
                               });
+                              onApplyFilter();
                             },
                             cardColour: category == filterProduct.quantite ? inactiveColor : Colors.white,
                             textColor: category == filterProduct.quantite ? Colors.black : inactiveColor,
                             text: "Quantite"),
+                        CardCategories(
+                            onPress: () {
+                              setState(() {
+                                category = filterProduct.date;
+                              });
+                              onApplyFilter();
+                            },
+                            cardColour: category == filterProduct.date ? inactiveColor : Colors.white,
+                            textColor: category == filterProduct.date ? Colors.black : inactiveColor,
+                            text: "Date"),
                       ],
                     )
                   ],
@@ -289,7 +299,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
-                      style: new TextStyle(color: Colors.black),
+                    style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                         labelText: 'Name',
                         //prefixIcon: Icon(Icons.email),
@@ -324,7 +334,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
               ),
               icon: Icon(Icons.exit_to_app, color: Colors.white),
               onPressed: () {
-                onSignOut();
+                myAppState.signOut();
               },
             ),
           ),

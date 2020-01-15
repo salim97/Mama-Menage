@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:mama_menage/components/askUser.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:open_file/open_file.dart';
@@ -30,16 +32,19 @@ class _Page_ValidationState extends State<Page_Validation> {
 
     String textOutput = "";
     textOutput += "Commande numero XX \n";
-    myAppState.selectedProducts?.forEach((p) {
-      if (p.checked) {
-        textOutput += "\nproduct name = " + p.name;
-        textOutput += "\nproduct cost = " + p.cost.toString();
-        textOutput += "\nproduct quantity = " + p.quantity.toString();
-        textOutput += "\nproduct total price = " + p.total.toString();
-        textOutput += "\n-----------------------------------------";
-      }
-    });
-    textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
+    if (myAppState.user.isPriceVisible) {
+      myAppState.selectedProducts?.forEach((p) {
+        if (p.checked) {
+          textOutput += "\nproduct name = " + p.name;
+          textOutput += "\nproduct cost = " + p.cost.toString();
+          textOutput += "\nproduct quantity = " + p.quantity.toString();
+          textOutput += "\nproduct total price = " + p.total.toString();
+          textOutput += "\n-----------------------------------------";
+        }
+      });
+      textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
+    }
+
     _textEditingController.text = textOutput;
   }
 
@@ -137,13 +142,58 @@ class _Page_ValidationState extends State<Page_Validation> {
   }
 
   onGMAIL() async {
-    final Email email = Email(
-      body: _textEditingController.text,
-      subject: 'LA FACTEEEEUUUURR',
-      isHTML: false,
-    );
+    await myAppState.getAllEmails();
+    List<Widget> m_actions = new List<Widget>();
+    for (int i = 0; i < myAppState.admin_emails.length; i++)
+      m_actions.add(CupertinoActionSheetAction(
+        child: Text(myAppState.admin_emails.elementAt(i)),
+        onPressed: () {
+          Navigator.pop(context, myAppState.admin_emails.elementAt(i));
+        },
+      ));
 
-    await FlutterEmailSender.send(email);
+    containerForSheet(
+        context: context,
+        child: CupertinoActionSheet(
+          title: const Text('ADMIN MAILS'),
+          message: const Text('select one of those mails'),
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('Cancel'),
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context, '');
+            },
+          ),
+          actions: m_actions,
+        ),
+        callback: (String selected) async {
+          if (selected == null) return;
+          if (!selected.contains("@")) return;
+
+          String textOutput = "";
+          textOutput += "Commande numero XX \n";
+          
+            myAppState.selectedProducts?.forEach((p) {
+              if (p.checked) {
+                textOutput += "\nproduct name = " + p.name;
+                textOutput += "\nproduct cost = " + p.cost.toString();
+                textOutput += "\nproduct quantity = " + p.quantity.toString();
+                textOutput += "\nproduct total price = " + p.total.toString();
+                textOutput += "\n-----------------------------------------";
+              }
+            });
+            textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
+
+            final Email email = Email(
+              recipients: [selected],
+              body: textOutput,
+              subject: 'LA FACTEEEEUUUURR',
+              isHTML: false,
+            );
+
+            await FlutterEmailSender.send(email);
+          
+        });
   }
 
   @override
@@ -167,27 +217,29 @@ class _Page_ValidationState extends State<Page_Validation> {
               Row(
                 children: <Widget>[
                   Expanded(child: Container()),
-                  RaisedButton(
-                    color: Colors.green,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          MdiIcons.filePdfBox,
-                          color: Colors.white,
-                        ),
-                        VerticalDivider(
-                          color: Colors.orange,
-                        ),
-                        Text(
-                          "PDF",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      onPDF();
-                    },
-                  ),
+                  myAppState.user.isPriceVisible
+                      ? RaisedButton(
+                          color: Colors.green,
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                MdiIcons.filePdfBox,
+                                color: Colors.white,
+                              ),
+                              VerticalDivider(
+                                color: Colors.orange,
+                              ),
+                              Text(
+                                "PDF",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          onPressed: () {
+                            onPDF();
+                          },
+                        )
+                      : Container(),
                   SizedBox(
                     width: 10,
                   ),

@@ -5,13 +5,17 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mama_menage/models/model_client.dart';
 import 'package:mama_menage/models/model_facture.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/models/model_user.dart';
+import 'package:flutter/services.dart';
 
 const DATABASE_PATH_users = "users";
 const DATABASE_PATH_prdocuts = "products";
 const DATABASE_PATH_factures = "factures";
+const DATABASE_PATH_clients = "clients";
+const DATABASE_PATH_admin_emails = "admin_emails";
 
 const DEV_MODE = false;
 
@@ -28,10 +32,16 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  //global
   List<ModelProduct> products = new List<ModelProduct>();
-  List<ModelProduct> selectedProducts = new List<ModelProduct>();
   List<ModelFacture> factures = new List<ModelFacture>();
-  ModelUser user ;
+  List<ModelClient> clients = new List<ModelClient>();
+  List<String> admin_emails = new List<String>();
+
+  //in use
+  ModelClient client;
+  ModelUser user;
+  List<ModelProduct> selectedProducts = new List<ModelProduct>();
 
   get counterSelectedProducts {
     int tmp = 0;
@@ -51,32 +61,32 @@ class MyAppState extends ChangeNotifier {
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes1.jpg",
+          imagePath: ["assets/images/clothes1.jpg"],
         ),
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes6.jpg",
+          imagePath: ["assets/images/clothes6.jpg"],
         ),
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes3.jpg",
+          imagePath: ["assets/images/clothes3.jpg"],
         ),
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes4.jpg",
+          imagePath: ["assets/images/clothes4.jpg"],
         ),
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes5.jpg",
+          imagePath: ["assets/images/clothes5.jpg"],
         ),
         ModelProduct(
           name: "Jacket",
           cost: 100,
-          imagePath: "assets/images/clothes7.jpg",
+          imagePath: ["assets/images/clothes7.jpg"],
         ),
       ];
       selectedProducts = products;
@@ -108,23 +118,6 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<ModelProduct>> mapToProducts(Map<dynamic, dynamic> mapResponse) async {
-    products.clear();
-    mapResponse?.forEach((key, value) async {
-      if (key.toString().isNotEmpty) {
-        products.add(ModelProduct.fromJson(value));
-      }
-    });
-    for (int i = 0; i < products.length; i++) {
-      // print(products.elementAt(i).imagePath);
-      products.elementAt(i).imagePath = await loadImage(products.elementAt(i).imagePath);
-      // print(products.elementAt(i).imagePath);
-    }
-
-    notifyListeners();
-    return products;
-  }
-
   Future<bool> login({String email, String password}) async {
     await signInAnonymously();
     DataSnapshot snapshot = await databaseReferenceUsers.once();
@@ -137,20 +130,91 @@ class MyAppState extends ChangeNotifier {
       }
     });
 
-    for(int i = 0 ; i < users.length ; i++ )
-    {
-        if (users.elementAt(i).name == email && users.elementAt(i).password == password) {
-          user = users.elementAt(i) ;
-          notifyListeners();
-          return true;
-        }
+    for (int i = 0; i < users.length; i++) {
+      if (users.elementAt(i).name == email && users.elementAt(i).password == password) {
+        user = users.elementAt(i);
+        await getAllClients();
+        notifyListeners();
+        return true;
+      }
     }
     return false;
   }
 
-  //EXTRA
+  signOut() {
+    client = null;
+    user = null;
+    selectedProducts.clear();
+    notifyListeners();
+  }
 
+  Future<List<ModelClient>> getAllClients() async {
+    DataSnapshot snapshot = await database.reference().child(DATABASE_PATH_clients).once();
+    Map<dynamic, dynamic> mapResponse = snapshot.value;
+    clients.clear();
+    mapResponse?.forEach((key, value) async {
+      if (key.toString().isNotEmpty) {
+        clients.add(ModelClient.fromJson(value));
+      }
+    });
+
+    notifyListeners();
+    return clients;
+  }
+
+  Future<List<ModelProduct>> getAllProducts() async {
+    DataSnapshot snapshot = await database.reference().child(DATABASE_PATH_prdocuts).once();
+    Map<dynamic, dynamic> mapResponse = snapshot.value;
+    products.clear();
+    mapResponse?.forEach((key, value) async {
+      if (key.toString().isNotEmpty) {
+        products.add(ModelProduct.fromJson(value));
+      }
+    });
+    for (int i = 0; i < products.length; i++) {
+      // print(products.elementAt(i).imagePath);
+      for (int j = 0; j < products.elementAt(i).imagePath.length; j++) {
+        products[i].imagePath[j] = await loadImage(products[i].imagePath[j]);
+      }
+
+      // print(products.elementAt(i).imagePath);
+    }
+
+    notifyListeners();
+    return products;
+  }
+
+  Future<List<String>> getAllEmails() async {
+    DataSnapshot snapshot = await database.reference().child(DATABASE_PATH_admin_emails).once();
+    List<dynamic> mapResponse = snapshot.value;
+    admin_emails.clear();
+    mapResponse?.forEach((value) async {
+      admin_emails.add(value.toString());
+    });
+
+    notifyListeners();
+    return admin_emails;
+  }
+
+  Future<bool> saveFatures() async {
+    String createdAt = new DateTime.now().millisecondsSinceEpoch.toString();
+  List<dynamic> array = new List<dynamic>();
+  selectedProducts.forEach((p) => array.add(p.toJson()));
+  await database.reference().child(DATABASE_PATH_factures).child(createdAt).set({
+    'createdAt': createdAt,
+    'user': user.toJson(),
+    'client': client.toJson(),
+    'products': array,
+  });
+  // databaseReference.child("2").set({
+  //   'title': 'Flutter in Action',
+  //   'description': 'Complete Programming Guide to learn Flutter'
+  // });
+
+  }
+  //EXTRA
   void flushbar({context, title, message, color = Colors.green}) {
+    if (context == null) return;
     Flushbar(
       flushbarPosition: FlushbarPosition.TOP,
       title: title,
@@ -167,6 +231,18 @@ class MyAppState extends ChangeNotifier {
   }
 
   Future<dynamic> loadImage(String image) async {
-    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+    // StorageReference sr = await FirebaseStorage.instance.ref().child(image) ;
+    // if(sr == null ) return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQkAAAC+CAMAAAARDgovAAAAbFBMVEUAAAD///+2trbv7+/y8vL19fX6+vrx8fG+vr6pqammpqaPj498fHz5+fmwsLCJiYnl5eXd3d2VlZXHx8egoKCFhYXDw8Pq6urW1tZxcXGZmZl3d3d7e3vQ0NBZWVna2tpmZmZNTU0qKipqamptl0nKAAACRklEQVR4nO3Vy5KbMBCF4WlJgLhKXGQwGNuTef93TDMTJ5NVNlRl838Ll9wUXdKRZL+9AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+C4Mvb4IvJPFCEi8nJ3F5DQon8e9H/Z9hu/+zkY+yl16kK41rjWll7kbRkhGJOvosyaWbT5v5mUlkNpNrXuhAWvE+D3OeWyfiXN7aQhqnXzONwWZ2EJf/eiOzubT64YrvvZb7Rca5MnKNNs+WayFxTLmWyk6ax7S3y9XKWC3pvOmfl0SROi/Psh51nWaZgr+Wseym3d59X3dd9uxiXYVo6+oyT8ugC+/rcoz1NEhVr3WZHkeXxWtYYldznC5fyr07ys2RbzjCu5QuSV9pycoaJbnT5n9eEm7TRWxip2IVv+yjBJmfU+g0mDyZWRrpB9mN1yPv3qfjjUoviZ701ZYPucqiy5N2+3HcnKk3eg0eTS5LDMtXEu5Iom8kBumnzySGKOG863FeEjrrq9x0OzPd5GU8krDH4Z2PVfdPfTQHuZix0+Nz00UUUuq+Gy91UR05PT7T2bvjAplpa4q+bo+KnjRpjmKtPxFBS5t2EUmZlKOOT3NeEjHUpS7ITrJOzSM2xjeLSWHXgl3rWkzTV6kusjV185SFWGfzEHwxpFKqeCRRfe/mL7J9JJ83aXBueN/aPt2D3D6S0UbaZbhvzoabP236/Iv+RhIvJPFCEi8/AeOuJz6xIWufAAAAAElFTkSuQmCC" ;
+    try {
+      return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+    } on PlatformException catch (e) {
+      // throw e.code;
+          print(e.code);
+      return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQkAAAC+CAMAAAARDgovAAAAbFBMVEUAAAD///+2trbv7+/y8vL19fX6+vrx8fG+vr6pqammpqaPj498fHz5+fmwsLCJiYnl5eXd3d2VlZXHx8egoKCFhYXDw8Pq6urW1tZxcXGZmZl3d3d7e3vQ0NBZWVna2tpmZmZNTU0qKipqamptl0nKAAACRklEQVR4nO3Vy5KbMBCF4WlJgLhKXGQwGNuTef93TDMTJ5NVNlRl838Ll9wUXdKRZL+9AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+C4Mvb4IvJPFCEi8nJ3F5DQon8e9H/Z9hu/+zkY+yl16kK41rjWll7kbRkhGJOvosyaWbT5v5mUlkNpNrXuhAWvE+D3OeWyfiXN7aQhqnXzONwWZ2EJf/eiOzubT64YrvvZb7Rca5MnKNNs+WayFxTLmWyk6ax7S3y9XKWC3pvOmfl0SROi/Psh51nWaZgr+Wseym3d59X3dd9uxiXYVo6+oyT8ugC+/rcoz1NEhVr3WZHkeXxWtYYldznC5fyr07ys2RbzjCu5QuSV9pycoaJbnT5n9eEm7TRWxip2IVv+yjBJmfU+g0mDyZWRrpB9mN1yPv3qfjjUoviZ701ZYPucqiy5N2+3HcnKk3eg0eTS5LDMtXEu5Iom8kBumnzySGKOG863FeEjrrq9x0OzPd5GU8krDH4Z2PVfdPfTQHuZix0+Nz00UUUuq+Gy91UR05PT7T2bvjAplpa4q+bo+KnjRpjmKtPxFBS5t2EUmZlKOOT3NeEjHUpS7ITrJOzSM2xjeLSWHXgl3rWkzTV6kusjV185SFWGfzEHwxpFKqeCRRfe/mL7J9JJ83aXBueN/aPt2D3D6S0UbaZbhvzoabP236/Iv+RhIvJPFCEi8/AeOuJz6xIWufAAAAAElFTkSuQmCC";
+
+    } catch (e) {
+      print(e);
+      return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQkAAAC+CAMAAAARDgovAAAAbFBMVEUAAAD///+2trbv7+/y8vL19fX6+vrx8fG+vr6pqammpqaPj498fHz5+fmwsLCJiYnl5eXd3d2VlZXHx8egoKCFhYXDw8Pq6urW1tZxcXGZmZl3d3d7e3vQ0NBZWVna2tpmZmZNTU0qKipqamptl0nKAAACRklEQVR4nO3Vy5KbMBCF4WlJgLhKXGQwGNuTef93TDMTJ5NVNlRl838Ll9wUXdKRZL+9AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+C4Mvb4IvJPFCEi8nJ3F5DQon8e9H/Z9hu/+zkY+yl16kK41rjWll7kbRkhGJOvosyaWbT5v5mUlkNpNrXuhAWvE+D3OeWyfiXN7aQhqnXzONwWZ2EJf/eiOzubT64YrvvZb7Rca5MnKNNs+WayFxTLmWyk6ax7S3y9XKWC3pvOmfl0SROi/Psh51nWaZgr+Wseym3d59X3dd9uxiXYVo6+oyT8ugC+/rcoz1NEhVr3WZHkeXxWtYYldznC5fyr07ys2RbzjCu5QuSV9pycoaJbnT5n9eEm7TRWxip2IVv+yjBJmfU+g0mDyZWRrpB9mN1yPv3qfjjUoviZ701ZYPucqiy5N2+3HcnKk3eg0eTS5LDMtXEu5Iom8kBumnzySGKOG863FeEjrrq9x0OzPd5GU8krDH4Z2PVfdPfTQHuZix0+Nz00UUUuq+Gy91UR05PT7T2bvjAplpa4q+bo+KnjRpjmKtPxFBS5t2EUmZlKOOT3NeEjHUpS7ITrJOzSM2xjeLSWHXgl3rWkzTV6kusjV185SFWGfzEHwxpFKqeCRRfe/mL7J9JJ83aXBueN/aPt2D3D6S0UbaZbhvzoabP236/Iv+RhIvJPFCEi8/AeOuJz6xIWufAAAAAElFTkSuQmCC";
+    }
   }
 }

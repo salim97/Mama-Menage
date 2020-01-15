@@ -70,13 +70,43 @@ void MainWindow::onDone()
 void MainWindow::on_pushButton_add_clicked()
 {
 
+
+    Row_User row_User ;
+    row_User.name="salim" ;
+    row_User.password="123456" ;
+    row_User.isPriceVisible=true ;
+    myFirebaseManager->setValue(PATH_USERS,row_User.toJSON());
+
+    Row_Client row_Client;
+    row_Client.name = "client03" ;
+    row_Client.phone = "06668569";
+    row_Client.address = "Oran, belgaid";
+    myFirebaseManager->setValue(PATH_CLIENTS,row_Client.toJSON());
+
+    QJsonArray arrayEmails ;
+    arrayEmails.push_back("email01@mail.com");
+    arrayEmails.push_back("email02@mail.com");
+    arrayEmails.push_back("email03@mail.com");
+    arrayEmails.push_back("email04@mail.com");
+    QJsonObject recordObject;
+    recordObject.insert(PATH_ADMIN_EMAILS, arrayEmails);
+    myFirebaseManager->setValue("",recordObject);
+
+
+return ;
+
     QString basePath = "d://Archive//GITHUB//SUDO-DEV//Mama-Menage//Android//mama_menage//assets//images//";
 
     QList<Row_Product> row_Product ;
-    row_Product.append(Row_Product("shoes6", 10, 300, basePath+"shoes6.jpeg"));
-    row_Product.append(Row_Product("clothes1", 15, 900, basePath+"clothes1.jpg"));
-    row_Product.append(Row_Product("furniture1", 5, 800, basePath+"furniture1.jpg"));
-    row_Product.append(Row_Product("shoes1", 25, 1200, basePath+"shoes1.jpg"));
+    row_Product.append(Row_Product("furniture1", 5, 800, QStringList() << basePath+"furniture1.jpg",
+                                   "detail detail detail"));
+    row_Product.append(Row_Product("shoes1-3", 10, 300, QStringList() << basePath+"shoes1.jpg" << basePath+"shoes2.jpg" << basePath+"shoes3.jpg",
+                                   "detail detail detail"));
+    row_Product.append(Row_Product("clothes1-2", 15, 900, QStringList() << basePath+"clothes1.jpg"<< basePath+"clothes2.jpg",
+                                   "detail detail detail"));
+    row_Product.append(Row_Product("shoes4-7", 25, 1200,
+                                   QStringList() << basePath+"shoes4.jpg"<< basePath+"shoes5.jpg"<< basePath+"shoes8.jpg"<< basePath+"shoes7.jpg",
+                                   "detail detail detail"));
     qDebug() << "Start uploading..." ;
     DialogProducts dialogProducts(PROJECT_ID) ;
     QNetworkReply::NetworkError replay = dialogProducts.uploadProducts(row_Product);
@@ -86,15 +116,11 @@ void MainWindow::on_pushButton_add_clicked()
     }
     else
     {
+        qDebug() << "ERRRRRROOOOOOOOOOOOR" ;
         qDebug() << replay ;
     }
 
-    return ;
-    //    Row_User row_User ;
-    //    row_User.name="dfgdf" ;
-    //    row_User.password="123456" ;
-    //    row_User.address="oran" ;
-    //    myFirebaseManager->setValue(PATH_USERS,row_User.toJSON());
+return ;
 
     //    {
     //        Row_Product row_Product ;
@@ -137,7 +163,6 @@ void MainWindow::on_pushButton_add_clicked()
 
 void MainWindow::dataIsReady()
 {
-
     QJsonObject json;
     json = myFirebaseManager->getChild(PATH_USERS);
     users.clear();
@@ -155,6 +180,7 @@ void MainWindow::dataIsReady()
         Row_Product row_Product ;
         row_Product.fromJSON(value.toObject());
         products.append(row_Product);
+
     }
 
     qDebug() << Q_FUNC_INFO;
@@ -162,4 +188,20 @@ void MainWindow::dataIsReady()
     qDebug() << "products.length() =" << products.length() ;
 
 
+}
+
+void MainWindow::on_pushButton_check_clicked()
+{
+    if(products.length() == 0 ) return ;
+    DialogProducts dialogProducts(PROJECT_ID) ;
+    QNetworkReply::NetworkError replay = dialogProducts.syncProducts(products);
+    if(replay == QNetworkReply::NoError)
+    {
+        qDebug() << "done" ;
+    }
+    else
+    {
+        qDebug() << "ERRRRRROOOOOOOOOOOOR" ;
+        qDebug() << replay ;
+    }
 }
