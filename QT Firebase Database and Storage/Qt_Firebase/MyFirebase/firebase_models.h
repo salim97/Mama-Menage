@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QDateTime>
+#include <QDebug>
 
 #define PATH_USERS "users"
 #define PATH_PRODUCTS "products"
@@ -203,30 +204,34 @@ public:
     {
         foreach(const QString& key, jsonObject.keys()) {
             QJsonValue value = jsonObject.value(key);
+
             if(key == "createdAt") createdAt = value.toString();
+            if(key == "client")
+            {
+                Row_Client tmp ;
+                tmp.fromJSON(value.toObject());
+                client = tmp ;
+            }
 
+            if(key == "user")
+            {
+                Row_User tmp ;
+                tmp.fromJSON(value.toObject());
+                user = tmp ;
+            }
 
-
-            if(key == PATH_PRODUCTS)
+            if(key == "products")
             {
                 products.clear();
-                foreach(const QString& key, value.toObject().keys()) {
-                    QJsonValue value2 = value.toObject().value(key);
+                QJsonArray array_products = value.toArray();
+                for(int i = 0 ; i < array_products.count() ; i++)
+                {
                     Row_Product row_Product ;
-                    row_Product.fromJSON(value2.toObject());
+                    row_Product.fromJSON(array_products.at(i).toObject());
                     products.append(row_Product);
-
                 }
             }
-            if(key == PATH_CLIENTS)
-            {
-                client.fromJSON(value.toObject());
-            }
 
-            if(key == PATH_USERS)
-            {
-                user.fromJSON(value.toObject());
-            }
         }
         return true ;
     }

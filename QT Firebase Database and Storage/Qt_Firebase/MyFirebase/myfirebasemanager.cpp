@@ -1,17 +1,20 @@
 #include "myfirebasemanager.h"
 
 #include <QFile>
+#include <QTimer>
 
 MyFirebaseManager::MyFirebaseManager(QString hostName, QObject *parent) : QObject(parent)
 {
     m_hostName = hostName;
     myFirebase = new MyFirebase(hostName, this);
-    connect(myFirebase, SIGNAL( eventResponseReady(QByteArray,QJsonObject,QString, bool) ),
-            this, SLOT( onEventResponseReady(QByteArray,QJsonObject,QString,bool) ));
+    connect(myFirebase, SIGNAL( eventResponseReady(QByteArray,QJsonObject,QString, bool,QNetworkReply*) ),
+            this, SLOT( onEventResponseReady(QByteArray,QJsonObject,QString,bool,QNetworkReply*) ));
     connect(myFirebase, SIGNAL(networkStateChanged(bool)), this, SLOT(onNetworkAccessibleChanged(bool)));
+     synchronous = new QEventLoop(this);
+     lastReplayError = QNetworkReply::NoError ;
 }
 
-void MyFirebaseManager::onEventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected)
+void MyFirebaseManager::onEventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected, QNetworkReply *reply)
 {
     //    qDebug() << "void MyFirebaseManager::onEventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url)" ;
     //    qDebug() << "url: " << url ;
@@ -20,7 +23,9 @@ void MyFirebaseManager::onEventResponseReady(QByteArray replyData, QJsonObject r
     if(url == m_hostName)
     {
         firebaseDB(replyJSON);
-        emit dataIsReady();
+        lastReplayError = reply->error() ;
+        synchronous->quit();
+        emit dataIsReady(reply);
     }
     else
     {
@@ -37,10 +42,25 @@ void MyFirebaseManager::onNetworkAccessibleChanged(bool isConnected)
 }
 
 
-void MyFirebaseManager::update()
+QNetworkReply::NetworkError MyFirebaseManager::update()
 {
     myFirebase->setPath("");
     myFirebase->getValue();
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
+    timer->start(4 * 1000);
+    synchronous->exec();
+
+    if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
+    {
+        timer->stop();
+        timer->deleteLater();
+    }
+    else                  // else donc fatet 4 second donc error time out
+            return QNetworkReply::TimeoutError ;
+
+    return lastReplayError ;
 }
 
 
@@ -51,14 +71,50 @@ void MyFirebaseManager::deleteValue(QString child)
     update();
 }
 
-void MyFirebaseManager::setValue(QString path, QString node, QVariant str)
+QNetworkReply::NetworkError MyFirebaseManager::setValue(QString path, QString node, QVariant str)
 {
+
+
     myFirebase->setValue(path, node, str);
+
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
+    timer->start(4 * 1000);
+    synchronous->exec();
+
+    if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
+    {
+        timer->stop();
+        timer->deleteLater();
+    }
+    else                  // else donc fatet 4 second donc error time out
+            return QNetworkReply::TimeoutError ;
+
+    return lastReplayError ;
 }
 
-void MyFirebaseManager::setValue(QString path, QJsonObject jsonObj)
+QNetworkReply::NetworkError MyFirebaseManager::setValue(QString path, QJsonObject jsonObj)
 {
+
+
     myFirebase->setValue(path, jsonObj);
+
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
+    timer->start(4 * 1000);
+    synchronous->exec();
+
+    if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
+    {
+        timer->stop();
+        timer->deleteLater();
+    }
+    else                  // else donc fatet 4 second donc error time out
+            return QNetworkReply::TimeoutError ;
+
+    return lastReplayError ;
 }
 
 void MyFirebaseManager::setValue(QString strVal)

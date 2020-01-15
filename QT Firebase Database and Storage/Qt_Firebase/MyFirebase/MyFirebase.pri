@@ -5,7 +5,8 @@ SOURCES += \
     $$PWD/json.cpp \
     $$PWD/myfirebase.cpp \
     $$PWD/myfirebasemanager.cpp \
-    $$PWD/mystorage.cpp
+    $$PWD/mystorage.cpp \
+    $$PWD/dialogproducts.cpp
 
 HEADERS += \
     $$PWD/actionhandler.h \
@@ -14,4 +15,8 @@ HEADERS += \
     $$PWD/myfirebase.h \
     $$PWD/myfirebasemanager.h \
     $$PWD/mypropertyhelper.h \
-    $$PWD/mystorage.h
+    $$PWD/mystorage.h \
+    $$PWD/firebase_models.h \
+    $$PWD/dialogproducts.h
+FORMS += \
+    $$PWD/dialogproducts.ui

@@ -1,6 +1,7 @@
 #ifndef MYFIREBASEMANAGER_H
 #define MYFIREBASEMANAGER_H
 
+#include <QEventLoop>
 #include <QObject>
 #include "myfirebase.h"
 #include "mypropertyhelper.h"
@@ -14,23 +15,23 @@ public:
 
 
 signals:
-    void dataIsReady();
+    void dataIsReady(QNetworkReply *reply);
     void networkStateChanged(bool isConnected);
 //    void eventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected);
 
 public slots:
 
-       void update();
+       QNetworkReply::NetworkError update();
 
     void deleteValue(QString child);
-    void setValue(QString path, QString node, QVariant str);
-    void setValue(QString path, QJsonObject jsonObj);
+    QNetworkReply::NetworkError setValue(QString path, QString node, QVariant str);
+    QNetworkReply::NetworkError setValue(QString path, QJsonObject jsonObj);
     void setValue(QString strVal);
     void rename(QString oldPath, QString newPath, QJsonObject jsonObj);
     QJsonObject getChild(QString path);
 
 private slots:
-    void onEventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected);
+    void onEventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected, QNetworkReply *reply);
     void onNetworkAccessibleChanged(bool isConnected);
 
 private:
@@ -38,7 +39,10 @@ private:
     QString m_hostName;
 
     QNetworkAccessManager networkAM;
+    QEventLoop *synchronous ;
+    QNetworkReply::NetworkError lastReplayError ;
     AUTO_PROPERTY(QJsonObject, firebaseDB)
+
 
 };
 

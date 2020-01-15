@@ -14,6 +14,7 @@ MyStorage::MyStorage(QObject *parent, QString PROJECT_ID) : QObject(parent)
 {
     networkAccessManager= new QNetworkAccessManager(this);
     this->PROJECT_ID = PROJECT_ID ;
+     synchronous = new QEventLoop(this); // chouf hna
 
 }
 
@@ -52,7 +53,7 @@ QNetworkReply::NetworkError MyStorage::getListOfFiles()
     QString url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o";
 
 
-    synchronous = new QEventLoop(this); // chouf hna
+
     QTimer *timer = new QTimer(this);
     timer->setSingleShot(true);
 

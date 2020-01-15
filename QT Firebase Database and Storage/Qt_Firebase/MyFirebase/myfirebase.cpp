@@ -125,7 +125,7 @@ void MyFirebase::replyFinished(QNetworkReply *reply)
 //        isConnectedToInternet = true ; NoError
     if (reply->error() == QNetworkReply::NoError)
         isConnectedToInternet = true;
-    emit eventResponseReady(readAll, rootObject, reply->request().url().toString().replace(".json", ""), isConnectedToInternet);
+    emit eventResponseReady(readAll, rootObject, reply->request().url().toString().replace(".json", ""), isConnectedToInternet, reply);
 
 
 //    QString data=QString(reply->readAll());

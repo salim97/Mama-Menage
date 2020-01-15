@@ -35,7 +35,7 @@ public slots:
     void setPath(QString path) ;
     QString getPath();
 signals:
-    void eventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected);
+    void eventResponseReady(QByteArray replyData, QJsonObject replyJSON, QString url, bool isConnected, QNetworkReply *reply);
     void eventDataChanged(DataSnapshot*);
     void networkStateChanged(bool isConnectedToInternet);
 
