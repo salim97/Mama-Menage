@@ -1,4 +1,6 @@
 import 'package:badges/badges.dart';
+import 'package:easy_localization/easy_localization.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:mama_menage/components/card_categories.dart';
@@ -6,15 +8,24 @@ import 'package:mama_menage/components/card_items.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/pages/page_login.dart';
 import 'package:mama_menage/pages/page_products_details.dart';
+import 'package:mama_menage/pages/page_settings.dart';
 import 'package:mama_menage/pages/page_validation.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'page_products_quantity.dart';
 
 final Color inactiveColor = Color(0xffc2c2c2);
-enum filterProduct { names, prices, quantite, date }
+enum sortProduct {
+  name_ascending,
+  name_descending,
+  createdAt_ascending,
+  createdAt_descending,
+  price_ascending,
+  price_descending
+}
 
 class Page_AllProdutcs extends StatefulWidget {
   const Page_AllProdutcs({Key key}) : super(key: key);
@@ -24,8 +35,6 @@ class Page_AllProdutcs extends StatefulWidget {
 }
 
 class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
-  filterProduct category = filterProduct.names;
-
   MyAppState myAppState;
   Size windowsSize;
   @override
@@ -33,7 +42,9 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
-    onRefresh();
+    
+
+    //onRefresh();
     //_refreshController
     Future.delayed(Duration(milliseconds: 100)).then((_) async {
       setState(() {
@@ -46,6 +57,10 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   onRefresh() async {
     if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllProducts();
+    if(!mounted) {
+      // dispose();
+      return ;
+    }
     setState(() {
       _products.clear();
       myAppState.products.forEach((p) => _products.add(p));
@@ -82,12 +97,13 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     return AppBar(
-      title: Text('LOGO'),
+      title: Text(AppLocalizations.of(context).tr('p_allProducts_appBar_title')),
       actions: <Widget>[
         IconButton(
-            icon: Icon(Icons.restore_from_trash, color: Colors.white),
+            icon: Icon(Icons.restore_from_trash,
+                color: myAppState.selectedProducts.length == 0 ? Colors.transparent : Colors.white),
             onPressed: () {
-              myAppState.selectedProducts.clear();
+              myAppState.products.forEach((p) => p.selectedProduct = false);
               myAppState.notifyListeners();
             }),
         Badge(
@@ -103,6 +119,8 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                   color: myAppState.selectedProducts.length == 0 ? Colors.white : Colors.orange),
               onPressed: () {
                 if (myAppState.selectedProducts.length == 0) return;
+                // myAppState.selectedProducts.forEach((p) => p.checked = true);
+                //           myAppState.notifyListeners();
                 Navigator.of(context)
                     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Products_Quantity()));
               }),
@@ -118,6 +136,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     final double itemHeight = (windowsSize.height - kToolbarHeight - (landscape ? 60 : 150)) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
+
     return SmartRefresher(
       controller: _refreshController,
       enablePullUp: true,
@@ -127,50 +146,36 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
       ),
       header: WaterDropHeader(),
       onRefresh: () async {
+        print("-----------------------------");
+        print("onRefresh: () async {");
         //monitor fetch data from network
         await onRefresh();
 
         _refreshController.refreshCompleted();
       },
-      onLoading: () async {
-        //monitor fetch data from network
-        print("-----------------------------");
-        print("onLoading: () async {");
+      // onLoading: () async {
+      //   //monitor fetch data from network
+      //   print("-----------------------------");
+      //   print("onLoading: () async {");
 
-        //if (mounted) setState(() {});
-        //_refreshController.loadFailed();
-      },
+      //   //if (mounted) setState(() {});
+      //   //_refreshController.loadFailed();
+      //   _refreshController.refreshCompleted();
+      // },
       child: Column(
         children: <Widget>[
           Expanded(
             child: Container(
               child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: landscape ? 2 : 3, childAspectRatio: (itemWidth / itemHeight)),
+                      crossAxisCount: landscape ? myAppState.landscape_count : myAppState.portrait_count,
+                      childAspectRatio: 1.0),
+                  padding: const EdgeInsets.all(4.0),
                   itemCount: _products.length,
                   controller: new ScrollController(keepScrollOffset: false),
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
-                    return CardItems(
-                      image: _products.elementAt(index).imagePath.first,
-                      name: _products.elementAt(index).name,
-                      cost: _products.elementAt(index).cost,
-                      isPriceVisible: myAppState.user.isPriceVisible,
-                      onPress: () {
-                        for (int i = 0; i < myAppState.selectedProducts.length; i++) {
-                          if (_products.elementAt(index).name == myAppState.selectedProducts.elementAt(i).name) return;
-                        }
-                        myAppState.selectedProducts.add(_products.elementAt(index));
-
-                        myAppState.notifyListeners();
-                      },
-                      onLongPress: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) => new Page_Products_Details(
-                                  index: index,
-                                )));
-                      },
-                    );
+                    return CardItems(index: index);
                   }),
             ),
           ),
@@ -183,6 +188,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
 
   List<ModelProduct> _products = List<ModelProduct>();
   onApplyFilter() async {
+    onApplySort();
     setState(() {
       _products.clear();
       myAppState.products.forEach((p) {
@@ -190,11 +196,78 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
           _products.add(p);
         else if (p.name.contains(c_nameController.text)) _products.add(p);
       });
-      if (category == filterProduct.names) _products.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toLowerCase()));
-      if (category == filterProduct.date) _products.sort((a, b) => a.createdAt.toUpperCase().compareTo(b.createdAt.toLowerCase()));
-      if (category == filterProduct.prices) _products.sort((a, b) => a.cost.compareTo( b.cost ));
-      if (category == filterProduct.quantite) _products.sort((a, b) =>  a.quantity.compareTo( b.quantity ));
     });
+  }
+
+  onApplySort() {
+    setState(() {
+      if (_sortProduct == sortProduct.name_ascending) myAppState.products.sort((a, b) => a.name.compareTo(b.name));
+      if (_sortProduct == sortProduct.name_descending) myAppState.products.sort((b, a) => a.name.compareTo(b.name));
+      if (_sortProduct == sortProduct.price_ascending) myAppState.products.sort((a, b) => a.cost.compareTo(b.cost));
+      if (_sortProduct == sortProduct.price_descending) myAppState.products.sort((b, a) => a.cost.compareTo(b.cost));
+      if (_sortProduct == sortProduct.createdAt_ascending) myAppState.products.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      if (_sortProduct == sortProduct.createdAt_descending)
+        myAppState.products.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+    });
+  }
+
+  sortProduct _sortProduct = sortProduct.name_ascending;
+  var sortList = [
+    {
+      "display": "Name - ascending",
+      "value": sortProduct.name_ascending,
+    },
+    {
+      "display": "Name - descending",
+      "value": sortProduct.name_descending,
+    },
+    {
+      "display": "Price - ascending",
+      "value": sortProduct.price_ascending,
+    },
+    {
+      "display": "Price - descending",
+      "value": sortProduct.price_descending,
+    },
+    {
+      "display": "Created At - ascending",
+      "value": sortProduct.createdAt_ascending,
+    },
+    {
+      "display": "Created At - descending",
+      "value": sortProduct.createdAt_descending,
+    },
+  ];
+
+  onSort() async {
+    final landscape = windowsSize.width > windowsSize.height ? true : false;
+    if (!landscape) Navigator.of(context).pop();
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+            elevation: 16,
+            child: Container(
+                height: 400.0,
+                width: 360.0,
+                child: ListView.builder(
+                    itemCount: sortList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return FlatButton(
+                        child: Text(sortList.elementAt(index)["display"]),
+                        onPressed: () {
+                          setState(() {
+                            _sortProduct = sortList.elementAt(index)["value"];
+                          });
+                          onApplySort();
+                          // onApplyFilter();
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    })),
+          );
+        });
   }
 
   Widget filterPage() {
@@ -231,77 +304,17 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                   ],
                 ),
               ),
-              Container(
-                height: 50,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 10,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        CardCategories(
-                            onPress: () {
-                              setState(() {
-                                category = filterProduct.names;
-                              });
-                              onApplyFilter();
-                            },
-                            cardColour: category == filterProduct.names ? inactiveColor : Colors.white,
-                            textColor: category == filterProduct.names ? Colors.black : inactiveColor,
-                            text: "Names"),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        myAppState.user.isPriceVisible ? 
-                        CardCategories(
-                            onPress: () {
-                              setState(() {
-                                category = filterProduct.prices;
-                              });
-                              onApplyFilter();
-                            },
-                            cardColour: category == filterProduct.prices ? inactiveColor : Colors.white,
-                            textColor: category == filterProduct.prices ? Colors.black : inactiveColor,
-                            text: "Price") : Container(),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        CardCategories(
-                            onPress: () {
-                              setState(() {
-                                category = filterProduct.quantite;
-                              });
-                              onApplyFilter();
-                            },
-                            cardColour: category == filterProduct.quantite ? inactiveColor : Colors.white,
-                            textColor: category == filterProduct.quantite ? Colors.black : inactiveColor,
-                            text: "Quantite"),
-                        CardCategories(
-                            onPress: () {
-                              setState(() {
-                                category = filterProduct.date;
-                              });
-                              onApplyFilter();
-                            },
-                            cardColour: category == filterProduct.date ? inactiveColor : Colors.white,
-                            textColor: category == filterProduct.date ? Colors.black : inactiveColor,
-                            text: "Date"),
-                      ],
-                    )
-                  ],
-                ),
+              RaisedButton.icon(
+                label: Text(AppLocalizations.of(context).tr("drawer_btn_sort"),),
+                icon: Icon(Icons.sort),
+                onPressed: onSort,
               ),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         //prefixIcon: Icon(Icons.email),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
@@ -317,6 +330,14 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                       onApplyFilter();
                     },
                   )),
+              RaisedButton.icon(
+                icon: Icon(Icons.settings),
+                label: Text(AppLocalizations.of(context).tr("drawer_btn_settings"),),
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Settings()));
+                },
+              )
             ],
           ),
         ),
@@ -329,7 +350,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
             child: FlatButton.icon(
               color: Colors.green,
               label: Text(
-                "Sign Out",
+                AppLocalizations.of(context).tr("drawer_btn_signout"),
                 style: TextStyle(color: Colors.white),
               ),
               icon: Icon(Icons.exit_to_app, color: Colors.white),

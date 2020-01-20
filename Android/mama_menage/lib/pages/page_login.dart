@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,8 @@ class _Page_LoginState extends State<Page_Login> {
     if (userName.isEmpty || password.isEmpty) {
       myAppState.flushbar(
           context: context,
-          message: "Insérez le nom d'utilisateur et le mot de passe, s'il vous plaît",
+           
+          message: AppLocalizations.of(context).tr('p_login_msg_field_empty'),
           color: Colors.orange);
       return;
     }
@@ -55,11 +57,11 @@ class _Page_LoginState extends State<Page_Login> {
     prefs.setString('userName', userName);
     if (userFound ) {
       
-      myAppState.flushbar(context: context, message: "login successfully", color: Colors.green);
+      myAppState.flushbar(context: context, message: AppLocalizations.of(context).tr('p_login_msg_success'), color: Colors.green);
         // Navigator.of(context)
                       // .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
     } else {
-      myAppState.flushbar(context: context, message: "failed to login", color: Colors.red);
+      myAppState.flushbar(context: context, message: AppLocalizations.of(context).tr('p_login_msg_failed'), color: Colors.red);
     }
   }
 
@@ -106,7 +108,7 @@ class _Page_LoginState extends State<Page_Login> {
                     children: <Widget>[
                       Container(),
                       Text(
-                        'NOM APP',
+                        AppLocalizations.of(context).tr('app_name'),
                         style: TextStyle(
                           fontSize: 27.0,
                         ),
@@ -116,7 +118,7 @@ class _Page_LoginState extends State<Page_Login> {
                       ),
                       Text(
                         //TODO update this
-                        'Sign in into your account',
+                        AppLocalizations.of(context).tr('p_login_label_sublogo_msg'),
                         style: TextStyle(
                           fontSize: 16.0,
                         ),
@@ -130,8 +132,8 @@ class _Page_LoginState extends State<Page_Login> {
                             child: Container(
                               width: windowsSize.width / 2,
                               child: new TextFormField(
-                                decoration: const InputDecoration(
-                                  labelText: 'Nom d’utilisateur',
+                                decoration: InputDecoration(
+                                  labelText: AppLocalizations.of(context).tr('p_login_label_username'),
                                   prefixIcon: Icon(Icons.email),
                                 ),
                                 keyboardType: TextInputType.emailAddress,
@@ -148,7 +150,7 @@ class _Page_LoginState extends State<Page_Login> {
                             width: windowsSize.width / 2,
                             child: new TextFormField(
                               decoration: InputDecoration(
-                                labelText: 'Mot de passe',
+                                labelText: AppLocalizations.of(context).tr('p_login_label_password'),
                                 prefixIcon: Icon(Icons.lock),
                                 suffixIcon: IconButton(
                                   onPressed: () {
@@ -194,7 +196,7 @@ class _Page_LoginState extends State<Page_Login> {
                                 margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
                                 child: Center(
                                     child: Text(
-                                  'Login',
+                                 AppLocalizations.of(context).tr('p_login_btn'),
                                   style: TextStyle(fontSize: 16, color: Colors.white),
                                 )),
                               )

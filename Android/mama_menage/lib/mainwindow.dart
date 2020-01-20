@@ -20,9 +20,9 @@ class _MainWindowState extends State<MainWindow> {
     myAppState = Provider.of<MyAppState>(context);
     if (myAppState.user == null)
       return Page_Login();
-    else if (myAppState.client == null)
+    // else if (myAppState.client == null)
       return Page_Clients();
-    else
-      return Page_AllProdutcs();
+    // else
+    //   return Page_AllProdutcs();
   }
 }

@@ -10,6 +10,7 @@ import 'package:mama_menage/models/model_facture.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/models/model_user.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const DATABASE_PATH_users = "users";
 const DATABASE_PATH_prdocuts = "products";
@@ -41,7 +42,7 @@ class MyAppState extends ChangeNotifier {
   //in use
   ModelClient client;
   ModelUser user;
-  List<ModelProduct> selectedProducts = new List<ModelProduct>();
+  List<ModelProduct> get selectedProducts => products.where((p) => p.selectedProduct ).toList();
 
   get counterSelectedProducts {
     int tmp = 0;
@@ -56,6 +57,7 @@ class MyAppState extends ChangeNotifier {
   }
 
   MyAppState() {
+    loadSettings();
     if (DEV_MODE) {
       products = [
         ModelProduct(
@@ -64,22 +66,22 @@ class MyAppState extends ChangeNotifier {
           imagePath: ["assets/images/clothes1.jpg"],
         ),
         ModelProduct(
-          name: "Jacket",
-          cost: 100,
+          name: "B",
+          cost: 50,
           imagePath: ["assets/images/clothes6.jpg"],
         ),
         ModelProduct(
-          name: "Jacket",
-          cost: 100,
+          name: "C",
+          cost: 300,
           imagePath: ["assets/images/clothes3.jpg"],
         ),
         ModelProduct(
-          name: "Jacket",
-          cost: 100,
+          name: "D",
+          cost: 200,
           imagePath: ["assets/images/clothes4.jpg"],
         ),
         ModelProduct(
-          name: "Jacket",
+          name: "E",
           cost: 100,
           imagePath: ["assets/images/clothes5.jpg"],
         ),
@@ -89,7 +91,7 @@ class MyAppState extends ChangeNotifier {
           imagePath: ["assets/images/clothes7.jpg"],
         ),
       ];
-      selectedProducts = products;
+      //selectedProducts = products;
     } else {
       signInAnonymously();
     }
@@ -144,7 +146,7 @@ class MyAppState extends ChangeNotifier {
   signOut() {
     client = null;
     user = null;
-    selectedProducts.clear();
+    products.forEach((p) => p.selectedProduct = false);
     notifyListeners();
   }
 
@@ -198,20 +200,21 @@ class MyAppState extends ChangeNotifier {
 
   Future<bool> saveFatures() async {
     String createdAt = new DateTime.now().millisecondsSinceEpoch.toString();
-  List<dynamic> array = new List<dynamic>();
-  selectedProducts.forEach((p) => array.add(p.toJson()));
-  await database.reference().child(DATABASE_PATH_factures).child(createdAt).set({
-    'createdAt': createdAt,
-    'user': user.toJson(),
-    'client': client.toJson(),
-    'products': array,
-  });
-  // databaseReference.child("2").set({
-  //   'title': 'Flutter in Action',
-  //   'description': 'Complete Programming Guide to learn Flutter'
-  // });
-
+    List<dynamic> array = new List<dynamic>();
+    selectedProducts.forEach((p) => array.add(p.toJson()));
+    await database.reference().child(DATABASE_PATH_factures).child(createdAt).set({
+      'createdAt': createdAt,
+      'user': user.toJson(),
+      'client': client.toJson(),
+      'products': array,
+    });
+    return true ;
+    // databaseReference.child("2").set({
+    //   'title': 'Flutter in Action',
+    //   'description': 'Complete Programming Guide to learn Flutter'
+    // });
   }
+
   //EXTRA
   void flushbar({context, title, message, color = Colors.green}) {
     if (context == null) return;
@@ -237,12 +240,25 @@ class MyAppState extends ChangeNotifier {
       return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
     } on PlatformException catch (e) {
       // throw e.code;
-          print(e.code);
+      print(e.code);
       return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQkAAAC+CAMAAAARDgovAAAAbFBMVEUAAAD///+2trbv7+/y8vL19fX6+vrx8fG+vr6pqammpqaPj498fHz5+fmwsLCJiYnl5eXd3d2VlZXHx8egoKCFhYXDw8Pq6urW1tZxcXGZmZl3d3d7e3vQ0NBZWVna2tpmZmZNTU0qKipqamptl0nKAAACRklEQVR4nO3Vy5KbMBCF4WlJgLhKXGQwGNuTef93TDMTJ5NVNlRl838Ll9wUXdKRZL+9AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+C4Mvb4IvJPFCEi8nJ3F5DQon8e9H/Z9hu/+zkY+yl16kK41rjWll7kbRkhGJOvosyaWbT5v5mUlkNpNrXuhAWvE+D3OeWyfiXN7aQhqnXzONwWZ2EJf/eiOzubT64YrvvZb7Rca5MnKNNs+WayFxTLmWyk6ax7S3y9XKWC3pvOmfl0SROi/Psh51nWaZgr+Wseym3d59X3dd9uxiXYVo6+oyT8ugC+/rcoz1NEhVr3WZHkeXxWtYYldznC5fyr07ys2RbzjCu5QuSV9pycoaJbnT5n9eEm7TRWxip2IVv+yjBJmfU+g0mDyZWRrpB9mN1yPv3qfjjUoviZ701ZYPucqiy5N2+3HcnKk3eg0eTS5LDMtXEu5Iom8kBumnzySGKOG863FeEjrrq9x0OzPd5GU8krDH4Z2PVfdPfTQHuZix0+Nz00UUUuq+Gy91UR05PT7T2bvjAplpa4q+bo+KnjRpjmKtPxFBS5t2EUmZlKOOT3NeEjHUpS7ITrJOzSM2xjeLSWHXgl3rWkzTV6kusjV185SFWGfzEHwxpFKqeCRRfe/mL7J9JJ83aXBueN/aPt2D3D6S0UbaZbhvzoabP236/Iv+RhIvJPFCEi8/AeOuJz6xIWufAAAAAElFTkSuQmCC";
-
     } catch (e) {
       print(e);
       return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQkAAAC+CAMAAAARDgovAAAAbFBMVEUAAAD///+2trbv7+/y8vL19fX6+vrx8fG+vr6pqammpqaPj498fHz5+fmwsLCJiYnl5eXd3d2VlZXHx8egoKCFhYXDw8Pq6urW1tZxcXGZmZl3d3d7e3vQ0NBZWVna2tpmZmZNTU0qKipqamptl0nKAAACRklEQVR4nO3Vy5KbMBCF4WlJgLhKXGQwGNuTef93TDMTJ5NVNlRl838Ll9wUXdKRZL+9AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+C4Mvb4IvJPFCEi8nJ3F5DQon8e9H/Z9hu/+zkY+yl16kK41rjWll7kbRkhGJOvosyaWbT5v5mUlkNpNrXuhAWvE+D3OeWyfiXN7aQhqnXzONwWZ2EJf/eiOzubT64YrvvZb7Rca5MnKNNs+WayFxTLmWyk6ax7S3y9XKWC3pvOmfl0SROi/Psh51nWaZgr+Wseym3d59X3dd9uxiXYVo6+oyT8ugC+/rcoz1NEhVr3WZHkeXxWtYYldznC5fyr07ys2RbzjCu5QuSV9pycoaJbnT5n9eEm7TRWxip2IVv+yjBJmfU+g0mDyZWRrpB9mN1yPv3qfjjUoviZ701ZYPucqiy5N2+3HcnKk3eg0eTS5LDMtXEu5Iom8kBumnzySGKOG863FeEjrrq9x0OzPd5GU8krDH4Z2PVfdPfTQHuZix0+Nz00UUUuq+Gy91UR05PT7T2bvjAplpa4q+bo+KnjRpjmKtPxFBS5t2EUmZlKOOT3NeEjHUpS7ITrJOzSM2xjeLSWHXgl3rWkzTV6kusjV185SFWGfzEHwxpFKqeCRRfe/mL7J9JJ83aXBueN/aPt2D3D6S0UbaZbhvzoabP236/Iv+RhIvJPFCEi8/AeOuJz6xIWufAAAAAElFTkSuQmCC";
     }
+  }
+
+  int landscape_count = 4;
+  int portrait_count = 3;
+  loadSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    landscape_count = (prefs.getInt('landscape_count') ?? 4);
+    portrait_count = (prefs.getInt('portrait_count') ?? 3);
+  }
+
+  saveSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('landscape_count', landscape_count);
+    prefs.setInt('portrait_count', portrait_count);
   }
 }

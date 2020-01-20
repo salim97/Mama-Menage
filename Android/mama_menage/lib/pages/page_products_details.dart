@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:mama_menage/components/myListTile.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
@@ -28,7 +29,7 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
-    _textEditingController.text = product.detail ;
+    _textEditingController.text = product.detail;
     Future.delayed(Duration.zero).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
@@ -106,24 +107,47 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
       images.add(Builder(
         builder: (BuildContext context) {
           return DEV_MODE
-              ? Image.asset(
-                  p,
-                  fit: BoxFit.fill,
-                )
-              // : Image.network(
-              //     p,
-              //     fit: BoxFit.fill,
-              //   )
-              :CachedNetworkImage(
-                    imageUrl: p,
-                    fit: BoxFit.fill,
-                    placeholder: (context, url) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  )
-                ;
+                  ? Image.asset(
+                      p,
+                      fit: BoxFit.fill,
+                    )
+                  // : Image.network(
+                  //     p,
+                  //     fit: BoxFit.fill,
+                  //   )
+                  : Image(
+                      image: AdvancedNetworkImage(
+                        p,
+                        // header: header,
+                        loadedCallback: () {
+                          print(product.imagePath.first);
+                          print('It works!');
+                        },
+                        loadFailedCallback: () {
+                          print(product.imagePath.first);
+                          print('Oh, no!');
+                        },
+                        loadingProgress: (progress, list) {
+                          print('Now Loading: $progress');
+                        },
+                        loadedFromDiskCacheCallback: () {
+                          print('Now loadedFromDiskCacheCallback: ');
+                        },
+                        useDiskCache: true,
+                        cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                      ),
+                      fit: BoxFit.fill,
+                    )
+              // :CachedNetworkImage(
+              //       imageUrl: p,
+              //       fit: BoxFit.fill,
+              //       placeholder: (context, url) => Padding(
+              //         padding: const EdgeInsets.all(8.0),
+              //         child: CircularProgressIndicator(),
+              //       ),
+              //       errorWidget: (context, url, error) => Icon(Icons.error),
+              //     )
+              ;
         },
       ));
     });

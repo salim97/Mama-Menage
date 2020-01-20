@@ -12,6 +12,7 @@ class ModelProduct {
   //local
   int selectedQuantity = 1;
   bool checked;
+  bool selectedProduct = false ;
   get total => quantity * cost;
 
   ModelProduct({

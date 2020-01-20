@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class MyListTile extends StatefulWidget {
-  int index;
+  final int index;
 
   MyListTile({Key key, @required this.index}) : super(key: key);
 
@@ -51,15 +52,40 @@ class _MyListTileState extends State<MyListTile> {
             DEV_MODE
                 ? Image.asset(product.imagePath.first, fit: BoxFit.fill, height: height, width: height)
                 // : Image.network(product.imagePath.first, fit: BoxFit.fill, height: height, width: height)
-                :CachedNetworkImage(
-                    imageUrl: product.imagePath.first,
+                : Image(
+                    image: AdvancedNetworkImage(
+                      product.imagePath.first,
+                      // header: header,
+                         loadedCallback: () {
+                          print( product.imagePath.first);
+                          print('It works!');
+                        },
+                        loadFailedCallback: () {
+                          print( product.imagePath.first);
+                          print('Oh, no!');
+                        },
+                        loadingProgress: (progress, list) {
+                          print('Now Loading: $progress');
+                        },
+                        loadedFromDiskCacheCallback: () {
+                          print('Now loadedFromDiskCacheCallback: ');
+                        },
+                      useDiskCache: true,
+                      cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                    ),
                     fit: BoxFit.fill,
                     height: height,
-                    width: height,
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  )
-                  ,
+                    width: height)
+            // :CachedNetworkImage(
+            //     imageUrl: product.imagePath.first,
+            //     fit: BoxFit.fill,
+            //     height: height,
+            //     width: height,
+            //     placeholder: (context, url) => CircularProgressIndicator(),
+            //     errorWidget: (context, url, error) => Icon(Icons.error),
+            //   )
+
+            ,
             Expanded(
               flex: 3,
               child: Column(
@@ -72,11 +98,12 @@ class _MyListTileState extends State<MyListTile> {
                   SizedBox(
                     height: SPACE_COLUMN_TEXT,
                   ),
-                  myAppState.user.isPriceVisible ?
-                  Text(
-                    product.cost.toStringAsFixed(2) + " DA",
-                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                  ): Container() ,
+                  myAppState.user.isPriceVisible
+                      ? Text(
+                          product.cost.toStringAsFixed(2) + " DA",
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
                   Expanded(
                     child: Container(),
                   ),
@@ -87,7 +114,7 @@ class _MyListTileState extends State<MyListTile> {
                         child: Container(),
                       ),
                       FloatingActionButton(
-                        heroTag: product.name+"++",
+                        heroTag: product.name + "++",
                         mini: true,
                         child: Icon(MdiIcons.minus),
                         onPressed: () {
@@ -109,14 +136,14 @@ class _MyListTileState extends State<MyListTile> {
                         width: SPACE_ROW_QUANTITY,
                       ),
                       FloatingActionButton(
-                         heroTag: product.name+"--",
+                        heroTag: product.name + "--",
                         mini: true,
                         child: Icon(MdiIcons.plus),
                         onPressed: () {
-                          if(product.selectedQuantity < product.quantity) 
-                          setState(() {
-                            product.selectedQuantity++;
-                          });
+                          if (product.selectedQuantity < product.quantity)
+                            setState(() {
+                              product.selectedQuantity++;
+                            });
                           myAppState.notifyListeners();
                         },
                       ),

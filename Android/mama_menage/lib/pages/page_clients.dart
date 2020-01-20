@@ -1,9 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:mama_menage/models/model_client.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import 'page_all_products.dart';
+enum sortClient {
+  name_ascending,
+  name_descending,
+  address_ascending,
+  address_descending,
+}
 
 class Page_Clients extends StatefulWidget {
   Page_Clients({Key key}) : super(key: key);
@@ -20,18 +29,22 @@ class _Page_ClientsState extends State<Page_Clients> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
-    onRefresh();
+    // myAppState.login(email: "salim", password: "123456");
+    //onRefresh();
     Future.delayed(Duration(milliseconds: 100)).then((_) async {
       setState(() {
         windowsSize = MediaQuery.of(context).size;
       });
-      //readProducts();
     });
   }
 
   onRefresh() async {
     if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllClients();
+        if(!mounted) {
+      // dispose();
+      return ;
+    }
     setState(() {
       _listData.clear();
       myAppState.clients.forEach((p) => _listData.add(p));
@@ -47,7 +60,9 @@ class _Page_ClientsState extends State<Page_Clients> {
     final landscape = windowsSize.width > windowsSize.height ? true : false;
     if (landscape)
       return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context).tr("p_clients_appBar_title")),
+        ),
         body: Stack(
           children: <Widget>[
             Positioned(
@@ -57,10 +72,10 @@ class _Page_ClientsState extends State<Page_Clients> {
         ),
       );
     else
-      return Scaffold(appBar: AppBar(), endDrawer: Drawer(child : filterPage()), body: body());
+      return Scaffold(appBar: AppBar(), endDrawer: Drawer(child: filterPage()), body: body());
   }
 
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController = RefreshController(initialRefresh: true);
 
   Widget body() {
     return SmartRefresher(
@@ -76,24 +91,32 @@ class _Page_ClientsState extends State<Page_Clients> {
         await onRefresh();
         _refreshController.refreshCompleted();
       },
-      onLoading: () async {
-        //monitor fetch data from network
-        print("-----------------------------");
-        print("onLoading: () async {");
+      // onLoading: () async {
+      //   //monitor fetch data from network
+      //   print("-----------------------------");
+      //   print("onLoading: () async {");
 
-        //if (mounted) setState(() {});
-        //_refreshController.loadFailed();
-      },
+      //   //if (mounted) setState(() {});
+      //   //_refreshController.loadFailed();
+      //   _refreshController.refreshCompleted();
+      // },
       child: ListView.builder(
         itemCount: _listData.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             title: Text(_listData.elementAt(index).name),
             subtitle: Text(_listData.elementAt(index).address),
-            trailing: Icon(Icons.gps_fixed),
+            leading: CircleAvatar(
+              // backgroundColor: Colors.brown.shade800,
+              child: Text(_listData.elementAt(index).name[0].toUpperCase()),
+            ),
             onTap: () {
+              myAppState.products.forEach((p) => p.selectedProduct = false);
               myAppState.client = _listData.elementAt(index);
               myAppState.notifyListeners();
+                Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) => new Page_AllProdutcs(
+                            )));
             },
           );
         },
@@ -106,6 +129,7 @@ class _Page_ClientsState extends State<Page_Clients> {
 
   List<ModelClient> _listData = List<ModelClient>();
   onApplyFilter() async {
+ 
     setState(() {
       _listData.clear();
       myAppState.clients.forEach((p) {
@@ -113,13 +137,13 @@ class _Page_ClientsState extends State<Page_Clients> {
           _listData.add(p);
           return;
         }
-        if (p.name.toLowerCase().contains(c_name.text.toLowerCase()) && p.address.toLowerCase().contains(c_address.text.toLowerCase()))
-        {
-          print("ADD" +p.name);
-          print(p.address.contains(c_address.text));
-          print(p.name.contains(c_name.text));
+        if (p.name.toLowerCase().contains(c_name.text.toLowerCase()) &&
+            p.address.toLowerCase().contains(c_address.text.toLowerCase())) {
+          // print("ADD" + p.name);
+          // print(p.address.contains(c_address.text));
+          // print(p.name.contains(c_name.text));
 
-           _listData.add(p);
+          _listData.add(p);
         }
 
         // if (name.isEmpty)
@@ -127,8 +151,66 @@ class _Page_ClientsState extends State<Page_Clients> {
         // else if (p.name.contains(name))
       });
     });
+    onApplySort();
   }
+  onApplySort() {
+    setState(() {
+      if (_sortClient == sortClient.name_ascending) _listData.sort((a, b) => a.name.compareTo(b.name));
+      if (_sortClient == sortClient.name_descending) _listData.sort((b, a) => a.name.compareTo(b.name));
+      if (_sortClient == sortClient.address_ascending) _listData.sort((a, b) => a.address.compareTo(b.address));
+      if (_sortClient == sortClient.address_descending) _listData.sort((b, a) => a.address.compareTo(b.address));
+    });
+  }
+  sortClient _sortClient = sortClient.name_ascending;
+  var sortList = [
+    {
+      "display": "Name - ascending",
+      "value": sortClient.name_ascending,
+    },
+    {
+      "display": "Name - descending",
+      "value": sortClient.name_descending,
+    },
+    {
+      "display": "Address - ascending",
+      "value": sortClient.address_ascending,
+    },
+    {
+      "display": "Address - descending",
+      "value": sortClient.address_descending,
+    },
+  ];
 
+  onSort() async {
+    final landscape = windowsSize.width > windowsSize.height ? true : false;
+    if (!landscape) Navigator.of(context).pop();
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+            elevation: 16,
+            child: Container(
+                height: 400.0,
+                width: 360.0,
+                child: ListView.builder(
+                    itemCount: sortList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return FlatButton(
+                        child: Text(sortList.elementAt(index)["display"]),
+                        onPressed: () {
+                          setState(() {
+                            _sortClient = sortList.elementAt(index)["value"];
+                          });
+                          onApplySort();
+                          // onApplyFilter();
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    })),
+          );
+        });
+  }
   Widget filterPage() {
     return Stack(
       children: <Widget>[
@@ -163,12 +245,17 @@ class _Page_ClientsState extends State<Page_Clients> {
                   ],
                 ),
               ),
+              RaisedButton.icon(
+                label: Text(AppLocalizations.of(context).tr("drawer_btn_sort"),),
+                icon: Icon(Icons.sort),
+                onPressed: onSort,
+              ),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
@@ -188,7 +275,7 @@ class _Page_ClientsState extends State<Page_Clients> {
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                        labelText: 'Address',
+                        labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
@@ -215,7 +302,7 @@ class _Page_ClientsState extends State<Page_Clients> {
             child: FlatButton.icon(
               color: Colors.green,
               label: Text(
-                "Sign Out",
+                AppLocalizations.of(context).tr("drawer_btn_signout"),
                 style: TextStyle(color: Colors.white),
               ),
               icon: Icon(Icons.exit_to_app, color: Colors.white),

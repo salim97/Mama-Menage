@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
@@ -29,6 +30,10 @@ class _Page_ValidationState extends State<Page_Validation> {
     super.initState();
 
     myAppState = Provider.of<MyAppState>(context, listen: false);
+        Future.delayed(Duration(seconds: 1)).then((_) async {
+      myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
+      //readProducts();
+    });
 
     String textOutput = "";
     textOutput += "Commande numero XX \n";
@@ -201,7 +206,9 @@ class _Page_ValidationState extends State<Page_Validation> {
     myAppState = Provider.of<MyAppState>(context);
     windowsSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).tr('p_validation_appBar_title'),),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Container(
