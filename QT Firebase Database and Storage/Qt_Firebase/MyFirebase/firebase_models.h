@@ -89,7 +89,8 @@ public:
 
 class Row_Product{
 public:
-    QString name, detail, createdAt;
+
+    QString code, name, detail, createdAt;
     QStringList image_local_path, image_remote_path;
     int quantite = 0, price = 0 ;
     Row_Product(QString name, int quantite, int price, QStringList image_local_path,
@@ -112,6 +113,7 @@ public:
     {
         QJsonObject recordObject;
         QJsonObject addressObject;
+        addressObject.insert("code", code);
         addressObject.insert("name", name);
         addressObject.insert("detail", detail);
         addressObject.insert("createdAt", createdAt);
@@ -133,7 +135,7 @@ public:
     }
     QString getUniqID()
     {
-        return QString(QCryptographicHash::hash((QString(name).toUtf8()),QCryptographicHash::Sha256).toHex());
+        return QString(QCryptographicHash::hash((QString(code).toUtf8()),QCryptographicHash::Sha256).toHex());
     }
 
     bool fromJSON(QJsonObject jsonObject)
@@ -141,6 +143,7 @@ public:
         foreach(const QString& key, jsonObject.keys()) {
             QJsonValue value = jsonObject.value(key);
             if(key == "name") name = value.toString();
+            if(key == "code") code = value.toString();
             if(key == "quantite") quantite = value.toInt();
             if(key == "price") price = value.toInt();
             if(key == "detail") detail = value.toString();

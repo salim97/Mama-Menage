@@ -19,19 +19,24 @@ MyStorage::MyStorage(QObject *parent, QString PROJECT_ID) : QObject(parent)
 }
 
 
-QString MyStorage::uploadImage(QString imagePath, QString fileName)
+QString MyStorage::uploadImage(QString imagePath )
 {
-
     QFile file(imagePath);
     if (!file.open(QIODevice::ReadWrite))
         return false;
 
     QByteArray dataToSend; // byte array to be sent in POST
     dataToSend = file.readAll();
-    QString url ;
-    if(fileName.isEmpty())
-        fileName = imagePath.split("/").last() ;
+QString fileName ;
 
+        fileName = imagePath.split("/").last() ;
+    return uploadImage(fileName, dataToSend);
+}
+
+QString MyStorage::uploadImage(QString fileName, QByteArray dataToSend)
+{
+
+ QString url ;
     url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o?uploadType=media&name="+fileName;
 
     QNetworkRequest *request = new QNetworkRequest(QUrl(url));
@@ -45,7 +50,6 @@ QString MyStorage::uploadImage(QString imagePath, QString fileName)
 
     return fileName ;
 }
-
 
 QNetworkReply::NetworkError MyStorage::getListOfFiles()
 {

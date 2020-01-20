@@ -14,7 +14,9 @@ class MyStorage : public QObject
 public:
     explicit MyStorage(QObject *parent = nullptr, QString PROJECT_ID = "");
 
-    QString uploadImage(QString imagePath, QString fileName= "");
+    QString uploadImage(QString imagePath);
+    QString uploadImage(QString fileName, QByteArray dataToSend);
+
     QNetworkReply::NetworkError getListOfFiles();
       QStringList remoteFiles ;
 signals:
