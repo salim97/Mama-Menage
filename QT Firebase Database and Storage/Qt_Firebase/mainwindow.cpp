@@ -169,29 +169,29 @@ void MainWindow::writeAllFromFirebase()
 
     return ;
 
-    QString basePath = "d://Archive//GITHUB//SUDO-DEV//Mama-Menage//Android//mama_menage//assets//images//";
+//    QString basePath = "d://Archive//GITHUB//SUDO-DEV//Mama-Menage//Android//mama_menage//assets//images//";
 
-    QList<Row_Product> row_Product ;
-    row_Product.append(Row_Product("furniture1", 5, 800, QStringList() << basePath+"furniture1.jpg",
-                                   "detail detail detail"));
-    row_Product.append(Row_Product("shoes1-3", 10, 300, QStringList() << basePath+"shoes1.jpg" << basePath+"shoes2.jpg" << basePath+"shoes3.jpg",
-                                   "detail detail detail"));
-    row_Product.append(Row_Product("clothes1-2", 15, 900, QStringList() << basePath+"clothes1.jpg"<< basePath+"clothes2.jpg",
-                                   "detail detail detail"));
-    row_Product.append(Row_Product("shoes4-7", 25, 1200,
-                                   QStringList() << basePath+"shoes4.jpg"<< basePath+"shoes5.jpg"<< basePath+"shoes8.jpg"<< basePath+"shoes7.jpg",
-                                   "detail detail detail"));
-    qDebug() << "Start uploading..." ;
-    DialogProducts dialogProducts(PROJECT_ID) ;
-    error = dialogProducts.uploadProducts(row_Product);
-    if(error != QNetworkReply::NoError)
-    {
-        qDebug() << Q_FUNC_INFO << error ;
-        return;
-    }
+//    QList<Row_Product> row_Product ;
+//    row_Product.append(Row_Product("furniture1", 5, 800, QStringList() << basePath+"furniture1.jpg",
+//                                   "detail detail detail"));
+//    row_Product.append(Row_Product("shoes1-3", 10, 300, QStringList() << basePath+"shoes1.jpg" << basePath+"shoes2.jpg" << basePath+"shoes3.jpg",
+//                                   "detail detail detail"));
+//    row_Product.append(Row_Product("clothes1-2", 15, 900, QStringList() << basePath+"clothes1.jpg"<< basePath+"clothes2.jpg",
+//                                   "detail detail detail"));
+//    row_Product.append(Row_Product("shoes4-7", 25, 1200,
+//                                   QStringList() << basePath+"shoes4.jpg"<< basePath+"shoes5.jpg"<< basePath+"shoes8.jpg"<< basePath+"shoes7.jpg",
+//                                   "detail detail detail"));
+//    qDebug() << "Start uploading..." ;
+//    DialogProducts dialogProducts(PROJECT_ID) ;
+//    error = dialogProducts.uploadProducts(row_Product);
+//    if(error != QNetworkReply::NoError)
+//    {
+//        qDebug() << Q_FUNC_INFO << error ;
+//        return;
+//    }
 
 
-    return ;
+//    return ;
 
     //    {
     //        Row_Product row_Product ;

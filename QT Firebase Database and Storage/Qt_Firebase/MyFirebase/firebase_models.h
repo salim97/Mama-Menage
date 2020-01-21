@@ -87,13 +87,29 @@ public:
     }
 };
 
+class Image{
+public:
+    QString fileName  ;
+    QByteArray data ;
+    Image(QString fileName, QByteArray data)
+    {
+        this->fileName = fileName ;
+        this->data = data ;
+    }
+    Image()
+    {
+        this->fileName = nullptr ;
+        this->data = nullptr ;
+    }
+};
+
 class Row_Product{
 public:
 
     QString code, name, detail, createdAt;
-    QStringList image_local_path, image_remote_path;
+    QList<Image> image_local_path, image_remote_path;
     int quantite = 0, price = 0 ;
-    Row_Product(QString name, int quantite, int price, QStringList image_local_path,
+    Row_Product(QString name, int quantite, int price, QList<Image> image_local_path,
                 QString detail = "", QString createdAt = "")
     {
         this->name = name;
@@ -102,7 +118,6 @@ public:
         this->quantite = quantite;
         this->price = price;
         this->image_local_path = image_local_path;
-        this->image_remote_path = image_remote_path;
     }
 
     Row_Product()
@@ -122,12 +137,12 @@ public:
 
         QJsonArray image_local_pathArray;
         for(int i = 0 ; i < image_local_path.length() ; i++)
-            image_local_pathArray.push_back(image_local_path[i]);
+            image_local_pathArray.push_back(image_local_path[i].fileName);
         addressObject.insert("image_local_path", image_local_pathArray);
 
         QJsonArray image_remote_pathArray;
         for(int i = 0 ; i < image_local_path.length() ; i++)
-            image_remote_pathArray.push_back(image_remote_path[i]);
+            image_remote_pathArray.push_back(image_remote_path[i].fileName);
         addressObject.insert("image_remote_path", image_remote_pathArray);
 
         recordObject.insert(getUniqID(), addressObject);
@@ -154,14 +169,14 @@ public:
                 image_local_path.clear();
                 QJsonArray image_local_pathArray = value.toArray();
                 for(int i = 0 ; i < image_local_pathArray.count() ; i++)
-                    image_local_path << image_local_pathArray.at(i).toString();
+                    image_local_path << Image(image_local_pathArray.at(i).toString(), nullptr);
             }
             if(key == "image_remote_path")
             {
                 image_remote_path.clear();
                 QJsonArray image_remote_pathArray = value.toArray();
                 for(int i = 0 ; i < image_remote_pathArray.count() ; i++)
-                    image_remote_path << image_remote_pathArray.at(i).toString();
+                    image_remote_path << Image(image_remote_pathArray.at(i).toString(), nullptr);
             }
 
         }

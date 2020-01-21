@@ -54,13 +54,13 @@ QNetworkReply::NetworkError DialogProducts::uploadProducts(QList<Row_Product> pr
         for(int j = 0 ; j < products.at(i).image_local_path.length() ; j++)
         {
             request_timer->stop();
-            QFile currentFile(products.at(i).image_local_path.at(j))   ;
-            qDebug() << currentFile.fileName() ;
-            qDebug() << currentFile.size() ;
+//            QFile currentFile(products.at(i).image_local_path.at(j))   ;
+//            qDebug() << currentFile.fileName() ;
+//            qDebug() << currentFile.size() ;
 
             //update UI
-            ui->label_file_name->setText(currentFile.fileName());
-            ui->label_current_total_size->setText("0 Byte / "+QString::number(currentFile.size())+" Byte");
+            ui->label_file_name->setText(products.at(i).image_local_path.at(j).fileName);
+            ui->label_current_total_size->setText("0 Byte / "+QString::number(products.at(i).image_local_path.at(j).data.length())+" Byte");
             ui->label_current_index_total_files->setText(QString::number(currentFileFromTotal) +" / "+QString::number(totalFiles));
             ui->progressBar_current_file->setValue(0);
             ui->progressBar_total_uploaded->setValue(currentFileFromTotal);
@@ -68,7 +68,11 @@ QNetworkReply::NetworkError DialogProducts::uploadProducts(QList<Row_Product> pr
 
             qDebug() << "START UPLOADING FILE" ;
             // start uploading
-            products[i].image_remote_path  << myStorage->uploadImage(currentFile.fileName());
+//            products[i].image_remote_path  << myStorage->uploadImage(currentFile.fileName());
+            products[i].image_remote_path  << Image(
+                                                  myStorage->uploadImage(
+                                                      products.at(i).image_local_path.at(j).fileName,
+                                                      products.at(i).image_local_path.at(j).data), nullptr);
 
             request_timer->start(requestTIMEOUT);
 
@@ -153,29 +157,30 @@ QNetworkReply::NetworkError DialogProducts::syncProducts(QList<Row_Product> prod
         for(int j = 0 ; j < products.at(i).image_local_path.length() ; j++)
         {
             request_timer->stop();
-            QFile currentFile(products.at(i).image_local_path.at(j))   ;
+//            QFile currentFile(products.at(i).image_local_path.at(j))   ;
 
 
             //update UI
-            ui->label_file_name->setText(currentFile.fileName());
-            ui->label_current_total_size->setText("0 Byte / "+QString::number(currentFile.size())+" Byte");
+            ui->label_file_name->setText(products.at(i).image_local_path.at(j).fileName);
+            ui->label_current_total_size->setText("0 Byte / "+QString::number(products.at(i).image_local_path.at(j).data.length())+" Byte");
             ui->label_current_index_total_files->setText(QString::number(currentFileFromTotal) +" / "+QString::number(totalFiles));
             ui->progressBar_current_file->setValue(0);
             ui->progressBar_total_uploaded->setValue(currentFileFromTotal);
             currentFileFromTotal++;
 
             if( j < products.at(i).image_remote_path.length()) ;
-            if(remoteFiles.contains(products.at(i).image_remote_path.at(j)))
+            if(remoteFiles.contains(products.at(i).image_remote_path.at(j).fileName))
             {
                 totalRemote++;
                 continue ;// don't upload,
             }
 
             qDebug() << "ERROOOR FILE NOT FOUND" ;
-            qDebug() << currentFile.fileName() ;
-            qDebug() << currentFile.size() ;
+            qDebug() << products.at(i).image_local_path.at(j).fileName ;
+            qDebug() << products.at(i).image_local_path.at(j).data.length() ;
             // start uploading
-            products[i].image_remote_path  << myStorage->uploadImage(currentFile.fileName());
+            products[i].image_remote_path  << Image(myStorage->uploadImage(products.at(i).image_local_path.at(j).fileName,
+                                                                     products.at(i).image_local_path.at(j).data), nullptr);
 
 
             request_timer->setSingleShot(true);
