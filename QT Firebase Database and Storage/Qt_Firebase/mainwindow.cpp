@@ -169,6 +169,10 @@ void MainWindow::writeAllFromFirebase()
 
     return ;
 
+    QByteArray image01DATA, image02DATA ;
+    QList<Row_Product> row_Product ;
+    row_Product.append(Row_Product("01", "furniture1", 5, 800, QList<Image>() << Image("image.png", image01DATA) << Image("image02.png", image02DATA),
+                                       "detail detail detail"));
 //    QString basePath = "d://Archive//GITHUB//SUDO-DEV//Mama-Menage//Android//mama_menage//assets//images//";
 
 //    QList<Row_Product> row_Product ;

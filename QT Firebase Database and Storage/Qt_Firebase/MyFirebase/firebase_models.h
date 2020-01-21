@@ -106,17 +106,20 @@ public:
 class Row_Product{
 public:
 
-    QString code, name, detail, createdAt;
+    QString code, name, detail, createdAt, mark, category;
     QList<Image> image_local_path, image_remote_path;
     int quantite = 0, price = 0 ;
-    Row_Product(QString name, int quantite, int price, QList<Image> image_local_path,
-                QString detail = "", QString createdAt = "")
+    Row_Product(QString code,QString name, int quantite, int price, QList<Image> image_local_path,
+                QString detail = "", QString createdAt = "", QString mark= "",QString category= "")
     {
         this->name = name;
         this->detail = detail;
         this->createdAt = createdAt.isEmpty() ? QString::number(QDateTime::currentSecsSinceEpoch()) : createdAt ;
         this->quantite = quantite;
         this->price = price;
+        this->mark = mark;
+        this->category = category;
+        this->code = code;
         this->image_local_path = image_local_path;
     }
 
@@ -134,6 +137,8 @@ public:
         addressObject.insert("createdAt", createdAt);
         addressObject.insert("quantite", quantite);
         addressObject.insert("price", price);
+        addressObject.insert("mark", mark);
+        addressObject.insert("category", category);
 
         QJsonArray image_local_pathArray;
         for(int i = 0 ; i < image_local_path.length() ; i++)
@@ -163,6 +168,8 @@ public:
             if(key == "price") price = value.toInt();
             if(key == "detail") detail = value.toString();
             if(key == "createdAt") createdAt = value.toString();
+            if(key == "mark") mark = value.toString();
+            if(key == "category") category = value.toString();
 
             if(key == "image_local_path")
             {
