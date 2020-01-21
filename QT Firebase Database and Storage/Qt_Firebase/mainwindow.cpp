@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     myFirebaseManager = new MyFirebaseManager("https://" PROJECT_ID ".firebaseio.com/");
 
-    //    connect(myFirebaseManager, SIGNAL(dataIsReady(QNetworkReply*)), this, SLOT(dataIsReady(QNetworkReply*)));
+       connect(myFirebaseManager, SIGNAL(dataIsReady(QNetworkReply*)), this, SLOT(dataIsReady(QNetworkReply*)));
 
     ui->tableWidget->setColumnCount(2);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "User Name"<<"Password");
@@ -102,12 +102,12 @@ void MainWindow::readAllFromFirebase()
 
     //read all factures
     json = myFirebaseManager->getChild(PATH_FACTURES);
-    factures.clear();
+    commandes.clear();
     foreach(const QString& key, json.keys()) {
         QJsonValue value = json.value(key);
-        Facture facture ;
+        Commande facture ;
         facture.fromJSON(value.toObject());
-        factures.append(facture);
+        commandes.append(facture);
 
     }
 
@@ -115,7 +115,7 @@ void MainWindow::readAllFromFirebase()
     qDebug() << Q_FUNC_INFO;
     qDebug() << "users.length() =" << users.length() ;
     qDebug() << "products.length() =" << products.length() ;
-    qDebug() << "factures.length() =" << factures.length() ;
+    qDebug() << "factures.length() =" << commandes.length() ;
 //    foreach ( Facture f, factures) {
 //        qDebug() << "------------------------";
 //        qDebug() << f.createdAt;
@@ -245,31 +245,16 @@ void MainWindow::on_pushButton_add_clicked()
 
 
 
-//void MainWindow::dataIsReady(QNetworkReply *reply)
-//{
-//    QJsonObject json;
-//    json = myFirebaseManager->getChild(PATH_USERS);
-//    users.clear();
-//    foreach(const QString& key, json.keys()) {
-//        QJsonValue value = json.value(key);
-//        Row_User row_User ;
-//        row_User.fromJSON(value.toObject());
-//        users.append(row_User);
-//    }
+void MainWindow::dataIsReady(QNetworkReply *reply)
+{
+    QJsonObject json;
+    json = myFirebaseManager->getChild(PATH_USERS);
+commandes.clear();
+//not done
 
-//    json = myFirebaseManager->getChild(PATH_PRODUCTS);
-//    products.clear();
-//    foreach(const QString& key, json.keys()) {
-//        QJsonValue value = json.value(key);
-//        Row_Product row_Product ;
-//        row_Product.fromJSON(value.toObject());
-//        products.append(row_Product);
+    qDebug() << Q_FUNC_INFO;
 
-//    }
-//    qDebug() << Q_FUNC_INFO;
-//    qDebug() << "users.length() =" << users.length() ;
-//    qDebug() << "products.length() =" << products.length() ;
-//}
+}
 
 void MainWindow::on_pushButton_check_clicked()
 {

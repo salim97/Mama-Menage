@@ -30,7 +30,7 @@ private slots:
 
     void on_pushButton_add_clicked();
 
-//    void dataIsReady(QNetworkReply *reply);
+    void dataIsReady(QNetworkReply *reply);
     void on_pushButton_check_clicked();
 
 private:
@@ -39,7 +39,7 @@ private:
     MyFirebaseManager *myFirebaseManager;
     QList<Row_User> users ;
     QList<Row_Product> products ;
-    QList<Facture> factures ;
+    QList<Commande> commandes ;
 
 };
 

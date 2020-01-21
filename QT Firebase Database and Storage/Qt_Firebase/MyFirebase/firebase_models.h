@@ -191,7 +191,7 @@ public:
     }
 };
 
-class Facture{
+class Commande{
 public:
     QString createdAt;
     QList<Row_Product> products;
