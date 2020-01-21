@@ -248,9 +248,18 @@ void MainWindow::on_pushButton_add_clicked()
 void MainWindow::dataIsReady(QNetworkReply *reply)
 {
     QJsonObject json;
-    json = myFirebaseManager->getChild(PATH_USERS);
-commandes.clear();
-//not done
+
+    //read all commandes
+    json = myFirebaseManager->getChild(PATH_COMMANDES);
+    commandes.clear();
+    foreach(const QString& key, json.keys()) {
+        QJsonValue value = json.value(key);
+        Commande facture ;
+        facture.fromJSON(value.toObject());
+        commandes.append(facture);
+
+    }
+
 
     qDebug() << Q_FUNC_INFO;
 
