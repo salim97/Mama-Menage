@@ -193,7 +193,7 @@ public:
 
 class Commande{
 public:
-    QString createdAt;
+    QString createdAt; // uniq for each commande
     QList<Row_Product> products;
     Row_User user ;
     Row_Client client;
