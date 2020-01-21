@@ -100,8 +100,8 @@ void MainWindow::readAllFromFirebase()
 
     }
 
-    //read all factures
-    json = myFirebaseManager->getChild(PATH_FACTURES);
+    //read all commandes
+    json = myFirebaseManager->getChild(PATH_COMMANDES);
     commandes.clear();
     foreach(const QString& key, json.keys()) {
         QJsonValue value = json.value(key);

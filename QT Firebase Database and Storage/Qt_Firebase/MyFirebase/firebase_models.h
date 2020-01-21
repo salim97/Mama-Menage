@@ -9,7 +9,7 @@
 
 #define PATH_USERS "users"
 #define PATH_PRODUCTS "products"
-#define PATH_FACTURES "commandes"
+#define PATH_COMMANDES "commandes"
 #define PATH_CLIENTS "clients"
 #define PATH_ADMIN_EMAILS "admin_emails"
 
