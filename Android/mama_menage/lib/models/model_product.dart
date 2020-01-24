@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 class ModelProduct {
   // remote
   List<String> imagePath;
+  String code;
   String name;
+  String mark;
+  String category;
   num cost;
   int quantity;
   String detail;
@@ -25,12 +28,16 @@ class ModelProduct {
 
   factory ModelProduct.fromJson(Map<dynamic, dynamic> json) {
     ModelProduct tmp = new ModelProduct();
+    tmp.code = json['code'] as String;
     tmp.name = json['name'] as String;
+    tmp.mark = json['mark'] as String;
+    tmp.category = json['category'] as String;
     tmp.detail = json['detail'] as String;
     tmp.createdAt = json['createdAt'] as String;
     tmp.quantity = json['quantite'] as num;
     tmp.cost = json['price'] as num;
     List<dynamic> a = json['image_remote_path'];
+    if( a == null ) return null ;
     tmp.imagePath = new List<String>();
     a.forEach((e) {
       tmp.imagePath.add(e);
@@ -45,7 +52,10 @@ class ModelProduct {
 
    Map<String, dynamic> toJson() =>
     {
+      'code': code,
       'name': name,
+      'mark': mark,
+      'category': category,
       'detail': detail,
       'createdAt': createdAt,
       'quantite': selectedQuantity,

@@ -14,12 +14,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const DATABASE_PATH_users = "users";
 const DATABASE_PATH_prdocuts = "products";
-const DATABASE_PATH_factures = "factures";
+const DATABASE_PATH_commandes = "commandes";
 const DATABASE_PATH_clients = "clients";
 const DATABASE_PATH_admin_emails = "admin_emails";
 
 const DEV_MODE = false;
-
+const BLACK_IMAGE = "http://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
 class MyAppState extends ChangeNotifier {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = new GoogleSignIn();
@@ -113,7 +113,7 @@ class MyAppState extends ChangeNotifier {
       //sensors = toSensorList(event.snapshot.value);
     });
 
-    databaseReferenceFactures = database.reference().child(DATABASE_PATH_factures);
+    databaseReferenceFactures = database.reference().child(DATABASE_PATH_commandes);
     databaseReferenceFactures.onChildChanged.listen((event) {
       print('info that changed: ${event.snapshot.key}: ${event.snapshot.value}');
     });
@@ -170,7 +170,8 @@ class MyAppState extends ChangeNotifier {
     products.clear();
     mapResponse?.forEach((key, value) async {
       if (key.toString().isNotEmpty) {
-        products.add(ModelProduct.fromJson(value));
+        if(ModelProduct.fromJson(value) != null )
+          products.add(ModelProduct.fromJson(value));
       }
     });
     for (int i = 0; i < products.length; i++) {
@@ -202,7 +203,7 @@ class MyAppState extends ChangeNotifier {
     String createdAt = new DateTime.now().millisecondsSinceEpoch.toString();
     List<dynamic> array = new List<dynamic>();
     selectedProducts.forEach((p) => array.add(p.toJson()));
-    await database.reference().child(DATABASE_PATH_factures).child(createdAt).set({
+    await database.reference().child(DATABASE_PATH_commandes).child(createdAt).set({
       'createdAt': createdAt,
       'user': user.toJson(),
       'client': client.toJson(),

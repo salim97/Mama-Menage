@@ -56,7 +56,7 @@ class _Page_LoginState extends State<Page_Login> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('userName', userName);
     if (userFound ) {
-      
+      if (context == null) return;
       myAppState.flushbar(context: context, message: AppLocalizations.of(context).tr('p_login_msg_success'), color: Colors.green);
         // Navigator.of(context)
                       // .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));

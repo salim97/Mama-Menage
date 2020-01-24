@@ -71,6 +71,8 @@ class _CardItemsState extends State<CardItems> {
                           loadFailedCallback: () {
                             print(product.imagePath.first);
                             print('Oh, no!');
+                            product.imagePath[0] = BLACK_IMAGE ;
+                            myAppState.notifyListeners();
                           },
                           loadingProgress: (progress, list) {
                             print('Now Loading: $progress');

@@ -40,7 +40,9 @@ QString MyStorage::uploadImage(QString fileName, QByteArray dataToSend)
     url = "https://firebasestorage.googleapis.com/v0/b/"+PROJECT_ID+".appspot.com/o?uploadType=media&name="+fileName;
 
     QNetworkRequest *request = new QNetworkRequest(QUrl(url));
-    request->setRawHeader("Content-Type","image/png");
+//    request->setRawHeader("Content-Type","image/png");
+    QByteArray imageType = "image/"+QString(fileName.split(".").last()).toUtf8() ;
+    request->setRawHeader("Content-Type", imageType);
     request->setHeader(QNetworkRequest::ContentLengthHeader,dataToSend.size());
     //connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)),this, SLOT(sendReportToServerReply(QNetworkReply*)));
     QNetworkReply *reply = networkAccessManager->post(*request,dataToSend);
