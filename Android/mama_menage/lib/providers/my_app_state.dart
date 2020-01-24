@@ -204,6 +204,7 @@ class MyAppState extends ChangeNotifier {
     List<dynamic> array = new List<dynamic>();
     selectedProducts.forEach((p) => array.add(p.toJson()));
     await database.reference().child(DATABASE_PATH_commandes).child(createdAt).set({
+      'valid': false,
       'createdAt': createdAt,
       'user': user.toJson(),
       'client': client.toJson(),

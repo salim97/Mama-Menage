@@ -197,7 +197,7 @@ public:
     QList<Row_Product> products;
     Row_User user ;
     Row_Client client;
-
+    bool valid;
     QJsonObject toJSON()
     {
         if(createdAt.isEmpty())
@@ -213,14 +213,15 @@ public:
             //uniqID += products[i].name ;
         }
         //addressObject.insert(PATH_PRODUCTS, products[i].toJSON());
-        addressObject.insert(PATH_PRODUCTS, productsArray);
-        addressObject.insert(PATH_USERS, user.toJSON());
-        addressObject.insert(PATH_CLIENTS, client.toJSON());
+        //addressObject.insert(PATH_PRODUCTS, productsArray);
+        //addressObject.insert(PATH_USERS, user.toJSON());
+        //addressObject.insert(PATH_CLIENTS, client.toJSON());
         addressObject.insert("createdAt", createdAt);
+        addressObject.insert("valid", valid);
         //generate uniq key in the tree
 
         uniqID = createdAt;
-        uniqID =  QString(QCryptographicHash::hash(uniqID.toUtf8(),QCryptographicHash::Sha256).toHex());
+        //uniqID =  QString(QCryptographicHash::hash(uniqID.toUtf8(),QCryptographicHash::Sha256).toHex());
         recordObject.insert(uniqID, addressObject);
         //recordObject.insert(id, addressObject);
         return recordObject;
@@ -230,6 +231,7 @@ public:
         foreach(const QString& key, jsonObject.keys()) {
             QJsonValue value = jsonObject.value(key);
 
+            if(key == "valid") valid = value.toBool();
             if(key == "createdAt") createdAt = value.toString();
             if(key == "client")
             {

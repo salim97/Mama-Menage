@@ -29,6 +29,7 @@ void MyFirebaseManager::onEventResponseReady(QByteArray replyData, QJsonObject r
     }
     else
     {
+        synchronous->quit();
         qDebug() << "void MyFirebaseManager::onEventResponseReady" ;
         qDebug() <<  "url: " << url;
         qDebug() << replyData  ;
@@ -51,7 +52,7 @@ QNetworkReply::NetworkError MyFirebaseManager::update()
     connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
     timer->start(4 * 1000);
     synchronous->exec();
-
+    disconnect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) );
     if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
     {
         timer->stop();
@@ -82,7 +83,7 @@ QNetworkReply::NetworkError MyFirebaseManager::setValue(QString path, QString no
     connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
     timer->start(4 * 1000);
     synchronous->exec();
-
+disconnect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) );
     if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
     {
         timer->stop();
@@ -105,7 +106,7 @@ QNetworkReply::NetworkError MyFirebaseManager::setValue(QString path, QJsonObjec
     connect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) ); // chouf hna
     timer->start(4 * 1000);
     synchronous->exec();
-
+disconnect(timer, SIGNAL(timeout()), synchronous, SLOT(quit()) );
     if(timer->isActive()) // chouf hna ( ida timer mazal yatmacha donc mafetch 4 second donc nkmel traitment
     {
         timer->stop();
