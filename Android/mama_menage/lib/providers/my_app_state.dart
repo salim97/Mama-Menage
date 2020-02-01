@@ -264,3 +264,10 @@ class MyAppState extends ChangeNotifier {
     prefs.setInt('portrait_count', portrait_count);
   }
 }
+
+Gradient customGradient =  LinearGradient(
+              colors: [
+               Color.fromRGBO(104, 193, 139, 1.0),
+                Color.fromRGBO(57, 178, 186, 1.0)
+              ]
+            );

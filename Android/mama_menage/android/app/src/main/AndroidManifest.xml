@@ -8,7 +8,7 @@
          <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="mama_menage"
+        android:label="Mama Menage"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -1,17 +1,17 @@
 {
     
     "app_name" : "NOM APP",
-    "p_login_label_sublogo_msg" : "Connectez-vous à votre compte",
+    "p_login_label_sublogo_msg" : "Sign in into your account",
     "p_login_label_username" : "Nom d’utilisateur",
     "p_login_label_password" : "Mot de passe",
     "p_login_btn" : "Se connecter",
     "p_login_msg_field_empty" : "Insérez le nom d'utilisateur et le mot de passe, s'il vous plaît",
-    "p_login_msg_success" : "connecté avec succès",
-    "p_login_msg_failed" : "échec de connexion",
+    "p_login_msg_success" : "login successfully",
+    "p_login_msg_failed" : "failed to login",
     
-    "p_settings_appBar_title" : "Options",
-    "p_settings_inputNumber_landscape" : "Élément paysage par nombre de lignes",
-    "p_settings_inputNumber_Portrait" : "Élément portrait par nombre de lignes",
+    "p_settings_appBar_title" : "Settings",
+    "p_settings_inputNumber_landscape" : "Landscape element per row count",
+    "p_settings_inputNumber_Portrait" : "Portrait element per row count",
 
 
     "p_validation_appBar_title" : "Validation",
@@ -23,15 +23,15 @@
     "p_productsDetails_textfield_details" : "Details du produit",
     
     
-    "p_allProducts_appBar_title" : "Tous les produits",
+    "p_allProducts_appBar_title" : "All products",
     
     
     "p_clients_appBar_title" : "Clients",
 
-    "drawer_btn_signout" : "Déconnexion",
-    "drawer_btn_settings" : "Options",
-    "drawer_btn_sort" : "Trier",
-    "drawer_filter_name" : "Nom",
+    "drawer_btn_signout" : "Sign Out",
+    "drawer_btn_settings" : "Settings",
+    "drawer_btn_sort" : "Sort",
+    "drawer_filter_name" : "Name",
     "drawer_filter_address" : "Address",
 
     "sort_name_ascending" : "Name - ascending",
@@ -40,7 +40,11 @@
     "sort_price_descending" : "Price - descending",
     "sort_createdAt_ascending" : "Created At - ascending",
     "sort_createdAt_descending" : "Created At - descending",
-    "sort_address_ascending" : "Adresse - ascendant",
-    "sort_address_descending" : "Adresse - descendant"
+    "sort_address_ascending" : "Address - ascending",
+    "sort_address_descending" : "Address - descending"
+
+
+    
+
 
 }

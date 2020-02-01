@@ -89,10 +89,14 @@ class _Page_LoginState extends State<Page_Login> {
           ),
           Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [
-              Colors.white.withOpacity(1),
-              Colors.white.withOpacity(.6),
-            ])),
+            //     gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [
+            //   // Colors.white.withOpacity(1),
+            //   // Colors.white.withOpacity(.6),
+            //   Color.fromRGBO(104, 193, 139, 1.0),
+            //     Color.fromRGBO(57, 178, 186, 1.0)
+            // ])
+color: Colors.white            
+            ),
           ),
           LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
             return SingleChildScrollView(
@@ -192,7 +196,9 @@ class _Page_LoginState extends State<Page_Login> {
                             ? Container(
                                 height: 50,
                                 width: windowsSize.width / 3,
-                                decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(50)),
+                                decoration: BoxDecoration(
+                                  gradient: customGradient,
+                                  color: Colors.green, borderRadius: BorderRadius.circular(50)),
                                 margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
                                 child: Center(
                                     child: Text(

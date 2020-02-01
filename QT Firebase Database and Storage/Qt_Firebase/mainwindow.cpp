@@ -37,6 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug() << commande.createdAt ;
         qDebug() << commande.client.name ;
         qDebug() << commande.valid ;
+
+        foreach (Row_Product product, commande.products) {
+                qDebug() << product.name ;
+        }
+
+
         if(commande.valid == false)
         {
             QNetworkReply::NetworkError error;
