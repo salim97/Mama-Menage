@@ -1,8 +1,6 @@
 import 'package:badges/badges.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:mama_menage/components/myListTile.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
@@ -116,25 +114,25 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                   //     fit: BoxFit.fill,
                   //   )
                   : Image(
-                      image: AdvancedNetworkImage(
+                      image: NetworkImage(
                         p,
                         // header: header,
-                        loadedCallback: () {
-                          print(product.imagePath.first);
-                          print('It works!');
-                        },
-                        loadFailedCallback: () {
-                          print(product.imagePath.first);
-                          print('Oh, no!');
-                        },
-                        loadingProgress: (progress, list) {
-                          print('Now Loading: $progress');
-                        },
-                        loadedFromDiskCacheCallback: () {
-                          print('Now loadedFromDiskCacheCallback: ');
-                        },
-                        useDiskCache: true,
-                        cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                        // loadedCallback: () {
+                        //   print(product.imagePath.first);
+                        //   print('It works!');
+                        // },
+                        // loadFailedCallback: () {
+                        //   print(product.imagePath.first);
+                        //   print('Oh, no!');
+                        // },
+                        // loadingProgress: (progress, list) {
+                        //   print('Now Loading: $progress');
+                        // },
+                        // loadedFromDiskCacheCallback: () {
+                        //   print('Now loadedFromDiskCacheCallback: ');
+                        // },
+                        // useDiskCache: true,
+                        // cacheRule: CacheRule(maxAge: const Duration(days: 7)),
                       ),
                       fit: BoxFit.fill,
                     )

@@ -204,7 +204,6 @@ class MyAppState extends ChangeNotifier {
     List<dynamic> array = new List<dynamic>();
     selectedProducts.forEach((p) => array.add(p.toJson()));
     await database.reference().child(DATABASE_PATH_commandes).child(createdAt).set({
-      'valid': false,
       'createdAt': createdAt,
       'user': user.toJson(),
       'client': client.toJson(),
@@ -264,10 +263,3 @@ class MyAppState extends ChangeNotifier {
     prefs.setInt('portrait_count', portrait_count);
   }
 }
-
-Gradient customGradient =  LinearGradient(
-              colors: [
-               Color.fromRGBO(104, 193, 139, 1.0),
-                Color.fromRGBO(57, 178, 186, 1.0)
-              ]
-            );

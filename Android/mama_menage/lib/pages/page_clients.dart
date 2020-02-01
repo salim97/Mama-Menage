@@ -300,7 +300,6 @@ class _Page_ClientsState extends State<Page_Clients> {
           child: Align(
             alignment: Alignment.center,
             child: FlatButton.icon(
-               
               color: Colors.green,
               label: Text(
                 AppLocalizations.of(context).tr("drawer_btn_signout"),

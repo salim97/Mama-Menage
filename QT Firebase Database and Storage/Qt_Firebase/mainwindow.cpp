@@ -25,38 +25,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     myFirebaseManager = new MyFirebaseManager("https://" PROJECT_ID ".firebaseio.com/");
 
-    connect(myFirebaseManager, SIGNAL(dataIsReady(QNetworkReply*)), this, SLOT(dataIsReady(QNetworkReply*)));
+       connect(myFirebaseManager, SIGNAL(dataIsReady(QNetworkReply*)), this, SLOT(dataIsReady(QNetworkReply*)));
 
     ui->tableWidget->setColumnCount(2);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "User Name"<<"Password");
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
     readAllFromFirebase();
-
-    foreach (Commande commande,  commandes) {
-        qDebug() << commande.createdAt ;
-        qDebug() << commande.client.name ;
-        qDebug() << commande.valid ;
-
-        foreach (Row_Product product, commande.products) {
-                qDebug() << product.name ;
-        }
-
-
-        if(commande.valid == false)
-        {
-            QNetworkReply::NetworkError error;
-            QString url = PATH_COMMANDES ;
-            url += "/"+commande.createdAt;
-            error =  myFirebaseManager->setValue(url, "valid", true );
-            if(error != QNetworkReply::NoError)
-            {
-                qDebug() << Q_FUNC_INFO << error ;
-                return;
-            }
-        }
-    }
-
 }
 
 MainWindow::~MainWindow()

@@ -1,8 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fleva_icons/fleva_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:mama_menage/models/model_product.dart';
 import 'package:mama_menage/pages/page_products_details.dart';
 import 'package:mama_menage/providers/my_app_state.dart';
@@ -61,29 +59,29 @@ class _CardItemsState extends State<CardItems> {
                 child: Image(
                   image: DEV_MODE
                       ? AssetImage(product.imagePath.first)
-                      : AdvancedNetworkImage(
+                      : NetworkImage(
                           product.imagePath.first,
                           // header: header,
-                          loadedCallback: () {
-                            print(product.imagePath.first);
-                            print('It works!');
-                          },
-                          loadFailedCallback: () {
-                            print(product.imagePath.first);
-                            print('Oh, no!');
-                            product.imagePath[0] = BLACK_IMAGE ;
-                            myAppState.notifyListeners();
-                          },
-                          loadingProgress: (progress, list) {
-                            print('Now Loading: $progress');
-                          },
-                          loadedFromDiskCacheCallback: () {
-                            print('Now loadedFromDiskCacheCallback: ');
-                          },
-                          useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 7)),
-                          timeoutDuration: const Duration(seconds: 1),
-                          retryLimit: 1
+                          // loadedCallback: () {
+                          //   print(product.imagePath.first);
+                          //   print('It works!');
+                          // },
+                          // loadFailedCallback: () {
+                          //   print(product.imagePath.first);
+                          //   print('Oh, no!');
+                          //   product.imagePath[0] = BLACK_IMAGE ;
+                          //   myAppState.notifyListeners();
+                          // },
+                          // loadingProgress: (progress, list) {
+                          //   print('Now Loading: $progress');
+                          // },
+                          // loadedFromDiskCacheCallback: () {
+                          //   print('Now loadedFromDiskCacheCallback: ');
+                          // },
+                          // useDiskCache: true,
+                          // cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                          // timeoutDuration: const Duration(seconds: 1),
+                          // retryLimit: 1
                         ),
                   fit: BoxFit.fill,
                   // height: windowsSize.height * 0.75,

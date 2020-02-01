@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "507095482058",
+    "firebase_url": "https://mama-menage.firebaseio.com",
+    "project_id": "mama-menage",
+    "storage_bucket": "mama-menage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507095482058:android:6b5ac054f1b2840215fe33",
+        "android_client_info": {
+          "package_name": "com.example.mama_menage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "507095482058-o5bs328g3ggbo0ukv2vtaeo8aap4ig62.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnJaylEv5ugRsCtwm8QVLo1zBPGmuYNig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507095482058-o5bs328g3ggbo0ukv2vtaeo8aap4ig62.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507095482058:android:d014605e6490b7de15fe33",
+        "android_client_info": {
+          "package_name": "com.example.mama_menage_android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "507095482058-o5bs328g3ggbo0ukv2vtaeo8aap4ig62.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnJaylEv5ugRsCtwm8QVLo1zBPGmuYNig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507095482058-o5bs328g3ggbo0ukv2vtaeo8aap4ig62.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
