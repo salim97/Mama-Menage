@@ -1,12 +1,15 @@
+import 'package:badges/badges.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:gradient_input_border/gradient_input_border.dart';
 import 'package:mama_menage_v3/models/model_client.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'page_all_products.dart';
+
 enum sortClient {
   name_ascending,
   name_descending,
@@ -16,7 +19,7 @@ enum sortClient {
 
 class Page_Clients extends StatefulWidget {
   Page_Clients({Key key}) : super(key: key);
-
+  
   @override
   _Page_ClientsState createState() => _Page_ClientsState();
 }
@@ -41,15 +44,17 @@ class _Page_ClientsState extends State<Page_Clients> {
   onRefresh() async {
     if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllClients();
-        if(!mounted) {
+    if (!mounted) {
       // dispose();
-      return ;
+      return;
     }
     setState(() {
       _listData.clear();
       myAppState.clients.forEach((p) => _listData.add(p));
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +63,10 @@ class _Page_ClientsState extends State<Page_Clients> {
 
     final drawerWidth = windowsSize.width * 0.25;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context).tr("p_clients_appBar_title")),
-        ),
+    return  Scaffold(
+      
+        
+        
         body: Stack(
           children: <Widget>[
             Positioned(
@@ -69,7 +74,8 @@ class _Page_ClientsState extends State<Page_Clients> {
             Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
           ],
         ),
-      );
+      
+    );
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: true);
@@ -111,9 +117,9 @@ class _Page_ClientsState extends State<Page_Clients> {
               myAppState.products.forEach((p) => p.selectedProduct = false);
               myAppState.client = _listData.elementAt(index);
               myAppState.notifyListeners();
-                Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => new Page_AllProdutcs(
-                            )));
+              myAppState.goNextTab() ;
+              // Navigator.of(context)
+              //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
             },
           );
         },
@@ -126,7 +132,6 @@ class _Page_ClientsState extends State<Page_Clients> {
 
   List<ModelClient> _listData = List<ModelClient>();
   onApplyFilter() async {
- 
     setState(() {
       _listData.clear();
       myAppState.clients.forEach((p) {
@@ -150,6 +155,7 @@ class _Page_ClientsState extends State<Page_Clients> {
     });
     onApplySort();
   }
+
   onApplySort() {
     setState(() {
       if (_sortClient == sortClient.name_ascending) _listData.sort((a, b) => a.name.compareTo(b.name));
@@ -158,6 +164,7 @@ class _Page_ClientsState extends State<Page_Clients> {
       if (_sortClient == sortClient.address_descending) _listData.sort((b, a) => a.address.compareTo(b.address));
     });
   }
+
   sortClient _sortClient = sortClient.name_ascending;
   var sortList = [
     {
@@ -208,6 +215,7 @@ class _Page_ClientsState extends State<Page_Clients> {
           );
         });
   }
+
   Widget filterPage() {
     return Stack(
       children: <Widget>[
@@ -217,13 +225,15 @@ class _Page_ClientsState extends State<Page_Clients> {
           right: 0,
           child: Column(
             children: <Widget>[
-           
-          
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
+                      border: GradientOutlineInputBorder(
+                                    focusedGradient: myGradient,
+                                    unfocusedGradient: myGradient,
+                                  ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
@@ -239,14 +249,15 @@ class _Page_ClientsState extends State<Page_Clients> {
                       onApplyFilter();
                     },
                   )),
-
-
-
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
+                      border: GradientOutlineInputBorder(
+                                    focusedGradient: myGradient,
+                                    unfocusedGradient: myGradient,
+                                  ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
@@ -262,41 +273,22 @@ class _Page_ClientsState extends State<Page_Clients> {
                       onApplyFilter();
                     },
                   )),
-
-                     Divider(),
+              Divider(),
               Align(
                 alignment: Alignment.center,
                 child: Text("Plus de filtres"),
               ),
-              
-RaisedButton.icon(
-                label: Text(AppLocalizations.of(context).tr("drawer_btn_sort"),),
+              RaisedButton.icon(
+                label: Text(
+                  AppLocalizations.of(context).tr("drawer_btn_sort"),
+                ),
                 icon: Icon(Icons.sort),
                 onPressed: onSort,
               ),
             ],
           ),
         ),
-            
-        Positioned(
-          bottom: 100,
-          left: 0,
-          right: 0,
-          child: Align(
-            alignment: Alignment.center,
-            child: FlatButton.icon(
-              color: Colors.green,
-              label: Text(
-                AppLocalizations.of(context).tr("drawer_btn_signout"),
-                style: TextStyle(color: Colors.white),
-              ),
-              icon: Icon(Icons.exit_to_app, color: Colors.white),
-              onPressed: () {
-                myAppState.signOut();
-              },
-            ),
-          ),
-        )
+        
       ],
     );
   }

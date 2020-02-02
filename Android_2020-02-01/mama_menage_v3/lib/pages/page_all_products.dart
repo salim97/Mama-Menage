@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:gradient_input_border/gradient_input_border.dart';
 import 'package:mama_menage_v3/components/card_categories.dart';
 import 'package:mama_menage_v3/components/card_items.dart';
 import 'package:mama_menage_v3/models/model_product.dart';
@@ -75,7 +76,7 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     final double itemHeight = (windowsSize.height - kToolbarHeight - 150) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
     return Scaffold(
-      appBar: appBar(),
+     
       body: Stack(
         children: <Widget>[
           Positioned(
@@ -280,6 +281,10 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
+                      border: GradientOutlineInputBorder(
+                                    focusedGradient: myGradient,
+                                    unfocusedGradient: myGradient,
+                                  ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         //prefixIcon: Icon(Icons.email),
                         suffixIcon: IconButton(
@@ -308,38 +313,20 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                 icon: Icon(Icons.sort),
                 onPressed: onSort,
               ),
-              RaisedButton.icon(
-                icon: Icon(Icons.settings),
-                label: Text(
-                  AppLocalizations.of(context).tr("drawer_btn_settings"),
-                ),
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Settings()));
-                },
-              )
+              // RaisedButton.icon(
+              //   icon: Icon(Icons.settings),
+              //   label: Text(
+              //     AppLocalizations.of(context).tr("drawer_btn_settings"),
+              //   ),
+              //   onPressed: () {
+              //     Navigator.of(context)
+              //         .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Settings()));
+              //   },
+              // )
             ],
           ),
         ),
-        Positioned(
-          bottom: 100,
-          left: 0,
-          right: 0,
-          child: Align(
-            alignment: Alignment.center,
-            child: FlatButton.icon(
-              color: Colors.green,
-              label: Text(
-                AppLocalizations.of(context).tr("drawer_btn_signout"),
-                style: TextStyle(color: Colors.white),
-              ),
-              icon: Icon(Icons.exit_to_app, color: Colors.white),
-              onPressed: () {
-                myAppState.signOut();
-              },
-            ),
-          ),
-        )
+       
       ],
     );
   }
