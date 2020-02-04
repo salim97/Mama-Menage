@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:intl/intl.dart';
 import 'package:mama_menage_v3/components/askUser.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -30,27 +31,46 @@ class _Page_ValidationState extends State<Page_Validation> {
     super.initState();
 
     myAppState = Provider.of<MyAppState>(context, listen: false);
-        Future.delayed(Duration(seconds: 1)).then((_) async {
-      myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
-      //readProducts();
-    });
+if(myAppState.currentFacture != null )
+{
 
-    String textOutput = "";
-    textOutput += "Commande numero XX \n";
+   String textOutput = "";
+    textOutput += "Commande numero "+myAppState.currentFacture.createdAt+" \n";
     if (myAppState.user.isPriceVisible) {
-      myAppState.selectedProducts?.forEach((p) {
-        if (p.checked) {
+      myAppState.currentFacture.products?.forEach((p) {
           textOutput += "\nproduct name = " + p.name;
           textOutput += "\nproduct cost = " + p.cost.toString();
           textOutput += "\nproduct quantity = " + p.quantity.toString();
           textOutput += "\nproduct total price = " + p.total.toString();
           textOutput += "\n-----------------------------------------";
-        }
       });
       textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
     }
 
     _textEditingController.text = textOutput;
+    return;
+}
+    //     Future.delayed(Duration(seconds: 1)).then((_) async {
+    //   myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
+    //   //readProducts();
+    // });
+
+    // String textOutput = "";
+    // textOutput += "Commande numero XX \n";
+    // if (myAppState.user.isPriceVisible) {
+    //   myAppState.selectedProducts?.forEach((p) {
+    //     if (p.checked) {
+    //       textOutput += "\nproduct name = " + p.name;
+    //       textOutput += "\nproduct cost = " + p.cost.toString();
+    //       textOutput += "\nproduct quantity = " + p.quantity.toString();
+    //       textOutput += "\nproduct total price = " + p.total.toString();
+    //       textOutput += "\n-----------------------------------------";
+    //     }
+    //   });
+    //   textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
+    // }
+
+    // _textEditingController.text = textOutput;
   }
 
   onPDF() async {
@@ -76,28 +96,38 @@ class _Page_ValidationState extends State<Page_Validation> {
     // ];
     tableData.add(<String>[
       "N°",
-      "Name",
-      "Cost",
-      "Quantity",
-      "Total",
+      "DESIGNATION",
+      "QP",
+      "QUANTITE",
+      "P.U",
+      "TVA(%)",
+      "TOTAL HT",
     ]);
-    for (int i = 0; i < myAppState.selectedProducts.length; i++) {
+
+      int total = 0 ;
+    for (int i = 0; i < myAppState.currentFacture.products.length; i++) {
       tableData.add(<String>[
         (i + 1).toString(),
-        myAppState.selectedProducts.elementAt(i).name,
-        myAppState.selectedProducts.elementAt(i).cost.toString(),
-        myAppState.selectedProducts.elementAt(i).quantity.toString(),
-        myAppState.selectedProducts.elementAt(i).total.toString(),
+        myAppState.currentFacture.products.elementAt(i).name,
+        myAppState.currentFacture.products.elementAt(i).quantity.toString(),
+        myAppState.currentFacture.products.elementAt(i).quantity.toString(),
+        myAppState.currentFacture.products.elementAt(i).cost.toString(),
+        "19.00",
+        myAppState.currentFacture.products.elementAt(i).total.toString(),
       ]);
+      total += myAppState.currentFacture.products.elementAt(i).total ;
     }
     tableData.add(<String>[
       " ",
       " ",
       " ",
+      " ", 
       " ",
-      myAppState.totalCostSelectedProducts.toString(),
+      " ",
+     total.toString(),
     ]);
-
+    String date = DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(myAppState.currentFacture.createdAt)));
+     
     pdf.addPage(w.MultiPage(
         pageFormat: PdfPageFormat.letter.copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
         crossAxisAlignment: w.CrossAxisAlignment.start,
@@ -121,14 +151,17 @@ class _Page_ValidationState extends State<Page_Validation> {
                   style: w.Theme.of(context).defaultTextStyle.copyWith(color: PdfColors.grey)));
         },
         build: (w.Context context) => <w.Widget>[
-              w.Header(
-                  level: 0,
-                  child: w.Row(
-                      mainAxisAlignment: w.MainAxisAlignment.spaceBetween,
-                      children: <w.Widget>[w.Text('Portable Document Format', textScaleFactor: 2), w.PdfLogo()])),
-              w.Paragraph(
-                  text:
-                      'The Portable Document Format (PDF) is a file format developed by Adobe in the 1990s to present documents, including text formatting and images, in a manner independent of application software, hardware, and operating systems. Based on the PostScript language, each PDF file encapsulates a complete description of a fixed-layout flat document, including the text, fonts, vector graphics, raster images and other information needed to display it. PDF was standardized as an open format, ISO 32000, in 2008, and no longer requires any royalties for its implementation.'),
+              // w.Header(
+              //     level: 0,
+              //     child: w.Row(
+              //         mainAxisAlignment: w.MainAxisAlignment.spaceBetween,
+              //         children: <w.Widget>[w.Text('MAMA MENAGE', textScaleFactor: 2), w.PdfLogo()])),
+              w.Header(level: 0, text: 'MAMA MENAGE'),
+              w.Header(level: 1, text: 'COP IMO BAHDJA 02 REGHAIA'),
+              w.Header(level: 1, text: 'ALGER'),
+              w.Header(level: 1, text: 'Tél                   Fax'),
+              w.Header(level: 1, text: 'RC 06/00-5112684 A16  FISCALE 178160601093118 ART 16430745011'),
+              w.Text('Date: ' + date, textScaleFactor: 2),
               w.Header(level: 1, text: 'History and standardization'),
               w.Paragraph(
                   text:
@@ -138,9 +171,9 @@ class _Page_ValidationState extends State<Page_Validation> {
               w.Paragraph(text: 'Text is available under the Creative Commons Attribution Share Alike License.')
             ]));
 
-    Directory tempDir = await getTemporaryDirectory();
+    Directory tempDir = await getApplicationDocumentsDirectory();
     String tempPath = tempDir.path;
-
+      print(tempPath) ;
     final File file = File(tempPath + '/example.pdf');
     file.writeAsBytesSync(pdf.save());
     OpenFile.open(tempPath + '/example.pdf');

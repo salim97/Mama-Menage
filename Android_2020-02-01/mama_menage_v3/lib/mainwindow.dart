@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'pages/page_all_products.dart';
 import 'pages/page_clients.dart';
+import 'pages/page_history.dart';
 import 'pages/page_login.dart';
 
 class MainWindow extends StatefulWidget {
@@ -23,7 +24,7 @@ class _MainWindowState extends State<MainWindow> with SingleTickerProviderStateM
     "Accueil",
     "Clients",
     "Produits",
-    // "Options",
+    "Historique",
   ];
   int currentIndex = 1;
   Widget currentWidget;
@@ -32,14 +33,14 @@ class _MainWindowState extends State<MainWindow> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-        myAppState = Provider.of<MyAppState>(context, listen: false);
-myAppState.goNextTab = () {
-setState(() {
-  _tabController.index = 2 ;
-  currentIndex = 2 ;
-});
-};
-    
+    myAppState = Provider.of<MyAppState>(context, listen: false);
+    myAppState.goNextTab = () {
+      setState(() {
+        _tabController.index = 2;
+        currentIndex = 2;
+      });
+    };
+
     _tabController = new TabController(vsync: this, length: choices.length);
     _tabController.index = 1;
   }
@@ -68,6 +69,7 @@ setState(() {
       ));
     if (currentIndex == 1) currentWidget = Page_Clients();
     if (currentIndex == 2) currentWidget = Page_AllProdutcs();
+    if (currentIndex == 3) currentWidget = Page_History();
 
     return Scaffold(
       appBar: AppBar(
@@ -85,8 +87,8 @@ setState(() {
                 myAppState.client = null;
                 myAppState.notifyListeners();
                 setState(() {
-                  _tabController.index = 1 ;
-                  currentIndex = 1 ;
+                  _tabController.index = 1;
+                  currentIndex = 1;
                 });
               }),
           Badge(
@@ -131,11 +133,11 @@ setState(() {
             );
           }).toList(),
           onTap: (index) {
-            if ( index == 2 && myAppState.client == null) {
+            if (index == 2 && myAppState.client == null) {
               setState(() {
                 _tabController.index = currentIndex;
               });
-              myAppState.flushbar(context: context, message: "veuillez sélectionner un client", color: Colors.orange) ;
+              myAppState.flushbar(context: context, message: "veuillez sélectionner un client", color: Colors.orange);
               return;
             }
 

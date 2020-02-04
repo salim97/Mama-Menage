@@ -42,9 +42,10 @@ class MyAppState extends ChangeNotifier {
   List<String> admin_emails = new List<String>();
 
   //in use
-  VoidCallback goNextTab ;
+  VoidCallback goNextTab;
   ModelClient client = null;
   ModelUser user;
+  ModelFacture currentFacture = null;
   List<ModelProduct> get selectedProducts => products.where((p) => p.selectedProduct).toList();
 
   get counterSelectedProducts {
@@ -96,7 +97,7 @@ class MyAppState extends ChangeNotifier {
       ];
       //selectedProducts = products;
     } else {
-      signInAnonymously();
+      //signInAnonymously();
     }
   }
 
@@ -167,6 +168,20 @@ class MyAppState extends ChangeNotifier {
     return clients;
   }
 
+  Future<List<ModelFacture>> getAllCommandes() async {
+    DataSnapshot snapshot = await database.reference().child(DATABASE_PATH_commandes).once();
+    Map<dynamic, dynamic> mapResponse = snapshot.value;
+    factures.clear();
+    mapResponse?.forEach((key, value) async {
+      if (key.toString().isNotEmpty) {
+        factures.add(ModelFacture.fromJson(value));
+      }
+    });
+
+    notifyListeners();
+    return factures;
+  }
+
   Future<List<ModelProduct>> getAllProducts() async {
     DataSnapshot snapshot = await database.reference().child(DATABASE_PATH_prdocuts).once();
     Map<dynamic, dynamic> mapResponse = snapshot.value;
@@ -205,12 +220,13 @@ class MyAppState extends ChangeNotifier {
     String createdAt = new DateTime.now().millisecondsSinceEpoch.toString();
     List<dynamic> array = new List<dynamic>();
     selectedProducts.forEach((p) => array.add(p.toJson()));
-    await database.reference().child(DATABASE_PATH_commandes).child(createdAt).set({
-      'createdAt': createdAt,
-      'user': user.toJson(),
-      'client': client.toJson(),
-      'products': array,
+    await database.reference().child(DATABASE_PATH_commandes).child(createdAt).set(
+        {'createdAt': createdAt, 'user': user.toJson(), 'client': client.toJson(), 'products': array, 'valid': false});
+    await getAllCommandes();
+    factures.forEach((f) {
+      if (f.createdAt == createdAt) currentFacture = f;
     });
+    notifyListeners();
     return true;
     // databaseReference.child("2").set({
     //   'title': 'Flutter in Action',

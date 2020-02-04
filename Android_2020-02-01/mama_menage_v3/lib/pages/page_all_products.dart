@@ -211,27 +211,27 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   sortProduct _sortProduct = sortProduct.name_ascending;
   var sortList = [
     {
-      "display": "Name - ascending",
+      "display": "Name - Ascendant",
       "value": sortProduct.name_ascending,
     },
     {
-      "display": "Name - descending",
+      "display": "Name - Descendant",
       "value": sortProduct.name_descending,
     },
     {
-      "display": "Price - ascending",
+      "display": "Price - Ascendant",
       "value": sortProduct.price_ascending,
     },
     {
-      "display": "Price - descending",
+      "display": "Price - Descendant",
       "value": sortProduct.price_descending,
     },
     {
-      "display": "Created At - ascending",
+      "display": "Created At - Ascendant",
       "value": sortProduct.createdAt_ascending,
     },
     {
-      "display": "Created At - descending",
+      "display": "Created At - Descendant",
       "value": sortProduct.createdAt_descending,
     },
   ];

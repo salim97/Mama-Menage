@@ -1,30 +1,26 @@
-import 'package:badges/badges.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_input_border/gradient_input_border.dart';
-import 'package:mama_menage_v3/models/model_client.dart';
+import 'package:mama_menage_v3/models/model_facture.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'page_all_products.dart';
+import 'page_validation.dart';
 
-enum sortClient {
-  name_ascending,
-  name_descending,
-  address_ascending,
-  address_descending,
+enum sortCommande {
+  numero_ascending,
+  numero_descending,
 }
 
-class Page_Clients extends StatefulWidget {
-  Page_Clients({Key key}) : super(key: key);
-  
+class Page_History extends StatefulWidget {
+  Page_History({Key key}) : super(key: key);
+
   @override
-  _Page_ClientsState createState() => _Page_ClientsState();
+  _Page_HistoryState createState() => _Page_HistoryState();
 }
 
-class _Page_ClientsState extends State<Page_Clients> {
+class _Page_HistoryState extends State<Page_History> {
   MyAppState myAppState;
   Size windowsSize;
   @override
@@ -41,20 +37,23 @@ class _Page_ClientsState extends State<Page_Clients> {
     });
   }
 
+  List<ModelFacture> _listData = List<ModelFacture>();
   onRefresh() async {
+    myAppState.currentFacture = null;
+    myAppState.notifyListeners();
     if (myAppState.database == null) await myAppState.signInAnonymously();
-    await myAppState.getAllClients();
+    await myAppState.getAllCommandes();
     if (!mounted) {
       // dispose();
       return;
     }
     setState(() {
       _listData.clear();
-      myAppState.clients.forEach((p) => _listData.add(p));
+      myAppState.factures.forEach((p) {
+        if (p.user.name == myAppState.user.name) _listData.add(p);
+      });
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,19 +61,15 @@ class _Page_ClientsState extends State<Page_Clients> {
     myAppState = Provider.of<MyAppState>(context);
 
     final drawerWidth = windowsSize.width * 0.25;
-    final landscape = windowsSize.width > windowsSize.height ? true : false;
-    return  Scaffold(
-      
-        
-        
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-                right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
-            Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
-          ],
-        ),
-      
+
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+              right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
+          Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
+        ],
+      ),
     );
   }
 
@@ -107,19 +102,21 @@ class _Page_ClientsState extends State<Page_Clients> {
         itemCount: _listData.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(_listData.elementAt(index).name),
-            subtitle: Text(_listData.elementAt(index).address),
+            title: Text(_listData.elementAt(index).createdAt +
+                " ( " +
+                new DateTime.fromMillisecondsSinceEpoch(int.parse(_listData.elementAt(index).createdAt)).toString() +
+                " ) "),
+            subtitle: Text(_listData.elementAt(index).client.name + " " + _listData.elementAt(index).user.name),
             leading: CircleAvatar(
               // backgroundColor: Colors.brown.shade800,
-              child: Text(_listData.elementAt(index).name[0].toUpperCase()),
+              child: Text(_listData.elementAt(index).client.name[0].toUpperCase()),
             ),
             onTap: () {
-              myAppState.products.forEach((p) => p.selectedProduct = false);
-              myAppState.client = _listData.elementAt(index);
+              myAppState.currentFacture = _listData.elementAt(index);
               myAppState.notifyListeners();
-              myAppState.goNextTab() ;
-              // Navigator.of(context)
-              //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
+              Navigator.of(context)
+                  .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Validation()));
+              // TODO: open validation mode
             },
           );
         },
@@ -127,24 +124,17 @@ class _Page_ClientsState extends State<Page_Clients> {
     );
   }
 
-  final c_name = TextEditingController();
-  final c_address = TextEditingController();
+  final c_numero = TextEditingController();
 
-  List<ModelClient> _listData = List<ModelClient>();
   onApplyFilter() async {
     setState(() {
       _listData.clear();
-      myAppState.clients.forEach((p) {
-        if (c_name.text.isEmpty && c_address.text.isEmpty) {
+      myAppState.factures.forEach((p) {
+        if (c_numero.text.isEmpty) {
           _listData.add(p);
           return;
         }
-        if (p.name.toLowerCase().contains(c_name.text.toLowerCase()) &&
-            p.address.toLowerCase().contains(c_address.text.toLowerCase())) {
-          // print("ADD" + p.name);
-          // print(p.address.contains(c_address.text));
-          // print(p.name.contains(c_name.text));
-
+        if (p.createdAt.toLowerCase().contains(c_numero.text.toLowerCase())) {
           _listData.add(p);
         }
 
@@ -158,30 +148,20 @@ class _Page_ClientsState extends State<Page_Clients> {
 
   onApplySort() {
     setState(() {
-      if (_sortClient == sortClient.name_ascending) _listData.sort((a, b) => a.name.compareTo(b.name));
-      if (_sortClient == sortClient.name_descending) _listData.sort((b, a) => a.name.compareTo(b.name));
-      if (_sortClient == sortClient.address_ascending) _listData.sort((a, b) => a.address.compareTo(b.address));
-      if (_sortClient == sortClient.address_descending) _listData.sort((b, a) => a.address.compareTo(b.address));
+      if (_sortClient == sortCommande.numero_ascending) _listData.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      if (_sortClient == sortCommande.numero_descending) _listData.sort((b, a) => a.createdAt.compareTo(b.createdAt));
     });
   }
 
-  sortClient _sortClient = sortClient.name_ascending;
+  sortCommande _sortClient = sortCommande.numero_ascending;
   var sortList = [
     {
-      "display": "Name - Ascendant",
-      "value": sortClient.name_ascending,
+      "display": "Numero de commande - Ascendant",
+      "value": sortCommande.numero_ascending,
     },
     {
-      "display": "Name - Descendant",
-      "value": sortClient.name_descending,
-    },
-    {
-      "display": "Address - Ascendant",
-      "value": sortClient.address_ascending,
-    },
-    {
-      "display": "Address - Descendant",
-      "value": sortClient.address_descending,
+      "display": "Numero de commande - Descendant",
+      "value": sortCommande.numero_descending,
     },
   ];
 
@@ -230,45 +210,21 @@ class _Page_ClientsState extends State<Page_Clients> {
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      border: GradientOutlineInputBorder(
-                                    focusedGradient: myGradient,
-                                    unfocusedGradient: myGradient,
-                                  ),
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                c_name.text = "";
+                                c_numero.text = "";
                               });
                               onApplyFilter();
                             })),
-                    keyboardType: TextInputType.text,
-                    controller: c_name,
-                    onChanged: (query) {
-                      onApplyFilter();
-                    },
-                  )),
-              Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new TextFormField(
-                    style: new TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: GradientOutlineInputBorder(
-                                    focusedGradient: myGradient,
-                                    unfocusedGradient: myGradient,
-                                  ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
-                        suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                c_address.text = "";
-                              });
-                              onApplyFilter();
-                            })),
-                    keyboardType: TextInputType.text,
-                    controller: c_address,
+                    keyboardType: TextInputType.number,
+                    controller: c_numero,
                     onChanged: (query) {
                       onApplyFilter();
                     },
@@ -288,7 +244,6 @@ class _Page_ClientsState extends State<Page_Clients> {
             ],
           ),
         ),
-        
       ],
     );
   }
