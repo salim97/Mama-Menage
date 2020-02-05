@@ -31,25 +31,23 @@ class _Page_ValidationState extends State<Page_Validation> {
     super.initState();
 
     myAppState = Provider.of<MyAppState>(context, listen: false);
-if(myAppState.currentFacture != null )
-{
-
-   String textOutput = "";
-    textOutput += "Commande numero "+myAppState.currentFacture.createdAt+" \n";
-    if (myAppState.user.isPriceVisible) {
-      myAppState.currentFacture.products?.forEach((p) {
+    if (myAppState.currentFacture != null) {
+      String textOutput = "";
+      textOutput += "Commande numero " + myAppState.currentFacture.createdAt + " \n";
+      if (myAppState.user.isPriceVisible) {
+        myAppState.currentFacture.products?.forEach((p) {
           textOutput += "\nproduct name = " + p.name;
           textOutput += "\nproduct cost = " + p.cost.toString();
           textOutput += "\nproduct quantity = " + p.quantity.toString();
           textOutput += "\nproduct total price = " + p.total.toString();
           textOutput += "\n-----------------------------------------";
-      });
-      textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
-    }
+        });
+        textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
+      }
 
-    _textEditingController.text = textOutput;
-    return;
-}
+      _textEditingController.text = textOutput;
+      return;
+    }
     //     Future.delayed(Duration(seconds: 1)).then((_) async {
     //   myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
     //   //readProducts();
@@ -104,7 +102,7 @@ if(myAppState.currentFacture != null )
       "TOTAL HT",
     ]);
 
-      int total = 0 ;
+    int total = 0;
     for (int i = 0; i < myAppState.currentFacture.products.length; i++) {
       tableData.add(<String>[
         (i + 1).toString(),
@@ -115,19 +113,74 @@ if(myAppState.currentFacture != null )
         "19.00",
         myAppState.currentFacture.products.elementAt(i).total.toString(),
       ]);
-      total += myAppState.currentFacture.products.elementAt(i).total ;
+      total += myAppState.currentFacture.products.elementAt(i).total;
     }
     tableData.add(<String>[
       " ",
       " ",
       " ",
-      " ", 
       " ",
       " ",
-     total.toString(),
+      "HORS TAXE (DA)",
+      total.toString(),
     ]);
-    String date = DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(myAppState.currentFacture.createdAt)));
-     
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "REMISE (DA)(0.00%)",
+      "0.00",
+    ]);
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "MONTAN, HORS TAXE (DA)",
+      "0",
+    ]);
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "T.V.A (DA)",
+      (total * 0.19).toString(),
+    ]);
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "TIMBRE (DA)",
+      "26",
+    ]);
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "R.T.A (DA)",
+      "0",
+    ]);
+    tableData.add(<String>[
+      " ",
+      " ",
+      " ",
+      " ",
+      " ",
+      "MONTANT T.T.C (DA)",
+      (26 + total * 1.19).toString(),
+    ]);
+    String date = DateFormat('dd/MM/yyyy')
+        .format(DateTime.fromMillisecondsSinceEpoch(int.parse(myAppState.currentFacture.createdAt)));
+
     pdf.addPage(w.MultiPage(
         pageFormat: PdfPageFormat.letter.copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
         crossAxisAlignment: w.CrossAxisAlignment.start,
@@ -162,18 +215,17 @@ if(myAppState.currentFacture != null )
               w.Header(level: 1, text: 'Tél                   Fax'),
               w.Header(level: 1, text: 'RC 06/00-5112684 A16  FISCALE 178160601093118 ART 16430745011'),
               w.Text('Date: ' + date, textScaleFactor: 2),
-              w.Header(level: 1, text: 'History and standardization'),
-              w.Paragraph(
-                  text:
-                      'The PDF file format has changed several times, and continues to evolve, along with the release of new versions of Adobe Acrobat. There have been nine versions of PDF and the corresponding version of the software:'),
+              w.Header(level: 1, text: 'Client'),
+              w.Header(level: 1, text: 'A ' + myAppState.currentFacture.client.name),
+              w.Header(level: 1, text: 'Address ' + myAppState.currentFacture.client.address),
               w.Table.fromTextArray(context: context, data: tableData),
               w.Padding(padding: const w.EdgeInsets.all(10)),
-              w.Paragraph(text: 'Text is available under the Creative Commons Attribution Share Alike License.')
+              // w.Paragraph(text: 'Text is available under the Creative Commons Attribution Share Alike License.')
             ]));
 
     Directory tempDir = await getApplicationDocumentsDirectory();
     String tempPath = tempDir.path;
-      print(tempPath) ;
+    print(tempPath);
     final File file = File(tempPath + '/example.pdf');
     file.writeAsBytesSync(pdf.save());
     OpenFile.open(tempPath + '/example.pdf');
@@ -210,27 +262,26 @@ if(myAppState.currentFacture != null )
 
           String textOutput = "";
           textOutput += "Commande numero XX \n";
-          
-            myAppState.selectedProducts?.forEach((p) {
-              if (p.checked) {
-                textOutput += "\nproduct name = " + p.name;
-                textOutput += "\nproduct cost = " + p.cost.toString();
-                textOutput += "\nproduct quantity = " + p.quantity.toString();
-                textOutput += "\nproduct total price = " + p.total.toString();
-                textOutput += "\n-----------------------------------------";
-              }
-            });
-            textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
 
-            final Email email = Email(
-              recipients: [selected],
-              body: textOutput,
-              subject: 'LA FACTEEEEUUUURR',
-              isHTML: false,
-            );
+          myAppState.selectedProducts?.forEach((p) {
+            if (p.checked) {
+              textOutput += "\nproduct name = " + p.name;
+              textOutput += "\nproduct cost = " + p.cost.toString();
+              textOutput += "\nproduct quantity = " + p.quantity.toString();
+              textOutput += "\nproduct total price = " + p.total.toString();
+              textOutput += "\n-----------------------------------------";
+            }
+          });
+          textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
 
-            await FlutterEmailSender.send(email);
-          
+          final Email email = Email(
+            recipients: [selected],
+            body: textOutput,
+            subject: 'LA FACTEEEEUUUURR',
+            isHTML: false,
+          );
+
+          await FlutterEmailSender.send(email);
         });
   }
 
@@ -240,11 +291,12 @@ if(myAppState.currentFacture != null )
     windowsSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-                   flexibleSpace: Container(
+        flexibleSpace: Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
-       
-        title: Text(AppLocalizations.of(context).tr('p_validation_appBar_title'),),
+        title: Text(
+          AppLocalizations.of(context).tr('p_validation_appBar_title'),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
