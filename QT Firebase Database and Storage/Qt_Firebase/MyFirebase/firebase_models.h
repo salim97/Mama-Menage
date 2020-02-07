@@ -211,7 +211,7 @@ public:
     QList<Row_Product> products;
     Row_User user ;
     Row_Client client;
-
+    bool valid;
     QJsonObject toJSON()
     {
         if(createdAt.isEmpty())
@@ -231,6 +231,7 @@ public:
         addressObject.insert(PATH_USERS, user.toJSON());
         addressObject.insert(PATH_CLIENTS, client.toJSON());
         addressObject.insert("createdAt", createdAt);
+        addressObject.insert("valid", valid);
         //generate uniq key in the tree
 
         uniqID = createdAt;
@@ -245,6 +246,7 @@ public:
             QJsonValue value = jsonObject.value(key);
 
             if(key == "createdAt") createdAt = value.toString();
+            if(key == "valid") valid = value.toBool();
             if(key == "client")
             {
                 Row_Client tmp ;
