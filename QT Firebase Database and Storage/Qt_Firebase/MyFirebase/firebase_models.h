@@ -197,7 +197,7 @@ public:
                 qp.clear();
                 QJsonArray qp_array = value.toArray();
                 for(int i = 0 ; i < qp_array.count() ; i++)
-                    qp << Image(qp_array.at(i).toInt(), nullptr);
+                    qp << qp_array.at(i).toInt();
             }
 
         }

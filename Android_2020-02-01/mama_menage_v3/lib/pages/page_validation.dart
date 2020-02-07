@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:mama_menage_v3/components/askUser.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
@@ -69,6 +70,53 @@ class _Page_ValidationState extends State<Page_Validation> {
     // }
 
     // _textEditingController.text = textOutput;
+  }
+  
+  onHTMLtoPDF() async {
+var htmlContent =
+"""
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td, p {
+    padding: 5px;
+    text-align: left;
+  }
+  </style>
+</head>
+  <body>
+    <h2>PDF Generated with flutter_html_to_pdf plugin</h2>
+    <table style="width:100%">
+      <caption>Sample HTML Table</caption>
+      <tr>
+        <th>Month</th>
+        <th>Savings</th>
+      </tr>
+      <tr>
+        <td>January</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>February</td>
+        <td>50</td>
+      </tr>
+    </table>
+    <p>Image loaded from web</p>
+    <img src="https://i.imgur.com/wxaJsXF.png" alt="web-img">
+  </body>
+</html>
+""";
+
+var targetPath = "/your/sample/path";
+var targetFileName = "example_pdf_file" ;
+
+var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
+    htmlContent, targetPath, targetFileName);
   }
 
   onPDF() async {
