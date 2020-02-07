@@ -107,9 +107,10 @@ class Row_Product{
 public:
 
     QString code, name, detail, createdAt, mark, category;
+    QList<int> qp;
     QList<Image> image_local_path, image_remote_path;
     int quantite = 0, price = 0 ;
-    Row_Product(QString code,QString name, int quantite, int price, QList<Image> image_local_path,
+    Row_Product(QString code,QString name, QList<int> qp, int quantite, int price, QList<Image> image_local_path,
                 QString detail = "", QString createdAt = "", QString mark= "",QString category= "")
     {
         this->name = name;
@@ -121,6 +122,7 @@ public:
         this->category = category;
         this->code = code;
         this->image_local_path = image_local_path;
+        this->qp = qp ;
     }
 
     Row_Product()
@@ -149,6 +151,11 @@ public:
         for(int i = 0 ; i < image_local_path.length() ; i++)
             image_remote_pathArray.push_back(image_remote_path[i].fileName);
         addressObject.insert("image_remote_path", image_remote_pathArray);
+
+        QJsonArray qp_array;
+        for(int i = 0 ; i < qp.length() ; i++)
+            qp_array.push_back(qp[i]);
+        addressObject.insert("qp", qp_array);
 
         recordObject.insert(getUniqID(), addressObject);
         return recordObject;
@@ -184,6 +191,13 @@ public:
                 QJsonArray image_remote_pathArray = value.toArray();
                 for(int i = 0 ; i < image_remote_pathArray.count() ; i++)
                     image_remote_path << Image(image_remote_pathArray.at(i).toString(), nullptr);
+            }
+            if(key == "qp")
+            {
+                qp.clear();
+                QJsonArray qp_array = value.toArray();
+                for(int i = 0 ; i < qp_array.count() ; i++)
+                    qp << Image(qp_array.at(i).toInt(), nullptr);
             }
 
         }
