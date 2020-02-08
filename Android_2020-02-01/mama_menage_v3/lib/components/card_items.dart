@@ -139,6 +139,13 @@ class _CardItemsState extends State<CardItems> {
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ),
+                      product.selectedQP != null ? Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "QP = " + product.selectedQP.toString(),
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ) : Container( ),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
