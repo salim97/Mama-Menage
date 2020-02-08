@@ -35,7 +35,10 @@ public:
     {
         return QString(QCryptographicHash::hash((QString(name+password).toUtf8()),QCryptographicHash::Sha256).toHex());
     }
-
+    QString pathDoc()
+    {
+        return QString(PATH_USERS)+"/"+getUniqID() ;
+    }
     bool fromJSON(QJsonObject jsonObject)
     {
         foreach(const QString& key, jsonObject.keys()) {
@@ -72,7 +75,10 @@ public:
     {
         return QString(QCryptographicHash::hash((QString(name).toUtf8()),QCryptographicHash::Sha256).toHex());
     }
-
+    QString pathDoc()
+    {
+        return QString(PATH_CLIENTS)+"/"+getUniqID() ;
+    }
     bool fromJSON(QJsonObject jsonObject)
     {
         foreach(const QString& key, jsonObject.keys()) {
@@ -163,6 +169,11 @@ public:
     QString getUniqID()
     {
         return QString(QCryptographicHash::hash((QString(code).toUtf8()),QCryptographicHash::Sha256).toHex());
+    }
+
+    QString pathDoc()
+    {
+        return QString(PATH_PRODUCTS)+"/"+getUniqID() ;
     }
 
     bool fromJSON(QJsonObject jsonObject)
@@ -277,6 +288,10 @@ public:
         return true ;
     }
 
+    QString pathDoc()
+    {
+        return QString(PATH_COMMANDES)+"/"+createdAt ;
+    }
 
 };
 
