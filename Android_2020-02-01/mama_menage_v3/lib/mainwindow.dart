@@ -81,7 +81,7 @@ class _MainWindowState extends State<MainWindow> with SingleTickerProviderStateM
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.restore_from_trash,
-                  color: myAppState.selectedProducts.length == 0  ? Colors.transparent : Colors.white),
+                  color:  myAppState.selectedProducts.length == 0  && myAppState.client == null   ? Colors.transparent : Colors.white),
               onPressed: () {
                 myAppState.products.forEach((p) => p.selectedProduct = false);
                 myAppState.client = null;
