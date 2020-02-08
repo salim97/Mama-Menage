@@ -76,7 +76,6 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     final double itemHeight = (windowsSize.height - kToolbarHeight - 150) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
     return Scaffold(
-     
       body: Stack(
         children: <Widget>[
           Positioned(
@@ -276,15 +275,23 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
           right: 0,
           child: Column(
             children: <Widget>[
+              myAppState.client != null
+                  ? Padding(
+                      padding: EdgeInsets.all(18.0),
+                      child: Text(
+                        "Client : " + myAppState.client.name,
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ))
+                  : Container(),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      border: GradientOutlineInputBorder(
-                                    focusedGradient: myGradient,
-                                    unfocusedGradient: myGradient,
-                                  ),
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         //prefixIcon: Icon(Icons.email),
                         suffixIcon: IconButton(
@@ -326,7 +333,6 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
             ],
           ),
         ),
-       
       ],
     );
   }

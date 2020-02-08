@@ -77,6 +77,7 @@ class _Page_ValidationState extends State<Page_Validation> {
   }
 
   onHTMLtoPDF() async {
+    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     // Directory tempDir = await getApplicationDocumentsDirectory();
     // Directory tempDir = await getDownloadsDirectory();
     Directory tempDir = await getTemporaryDirectory();
@@ -93,7 +94,7 @@ class _Page_ValidationState extends State<Page_Validation> {
   }
 
   onPDF() async {
-    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    
     await onHTMLtoPDF();
     OpenFile.open(_pdf_path);
   }

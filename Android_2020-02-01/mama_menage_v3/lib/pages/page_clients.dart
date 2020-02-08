@@ -222,12 +222,7 @@ class _Page_ClientsState extends State<Page_Clients> {
           right: 0,
           child: Column(
             children: <Widget>[
-              myAppState.client != null ?
-              Padding(
-                  padding: EdgeInsets.all(18.0),
-                  child: Text("Client : " + myAppState.client.name,  
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),)
-              ) : Container(),
+
               Divider(),
               Padding(
                   padding: EdgeInsets.all(10.0),
