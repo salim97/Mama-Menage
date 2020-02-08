@@ -233,7 +233,224 @@ class MyAppState extends ChangeNotifier {
     //   'description': 'Complete Programming Guide to learn Flutter'
     // });
   }
+  String currentFactureToHTML() 
+  {
+    String tableBody = ""; 
+        int total = 0;
+        
+    for (int i = 0; i < currentFacture.products.length; i++) {
+      tableBody += " <tr>" ;
+       tableBody += " <td style=\"width: 5%\"><b> "+(i+1).toString()+"<br></b></td>" ;
+       tableBody += " <td style=\"width: 50%\"><b> "+currentFacture.products.elementAt(i).name+"<br></b></td>" ;
+       tableBody += " <td style=\"width: 10%\"><b> "+currentFacture.products.elementAt(i).selectedQP.toString()+"<br></b></td>" ;
+       tableBody += " <td style=\"width: 10%\"><b> "+currentFacture.products.elementAt(i).quantity.toString()+"<br></b></td>" ;
+       tableBody += " <td style=\"width: 10%\"><b> "+currentFacture.products.elementAt(i).cost.toString()+"<br></b></td>" ;
+       tableBody += " <td style=\"width: 10%\"><b> 19.00<br></b></td>" ;
+       tableBody += " <td style=\"width: 10%\"><b> "+currentFacture.products.elementAt(i).total.toString()+"<br></b></td>" ;
+      tableBody += " </tr>" ;
+      total += currentFacture.products.elementAt(i).total;
+    }
 
+//first page 20 max
+
+
+
+
+    String clientBody = "";
+    clientBody += "<p><b>Client: "+currentFacture.client.name+"</b></p>";
+    clientBody += "<p>Adresse: "+currentFacture.client.name+"</p>";
+    
+    clientBody += "<pre>N RC: ####### &#9;| N FISCALE: #######</pre>";
+    clientBody += "<pre>N ART: ####### </pre>";
+
+                
+              int pageCount = 1 ;  
+                
+    String htmlContent =
+"""
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Facture</title>
+     <link rel="stylesheet" href="style_moz.css">
+    <style>
+        #body {
+        background: rgb(204, 204, 204);
+        }
+        table {
+        border-collapse: collapse;
+        }
+        table,
+        th,
+        td {
+        border: 2px solid #888888;
+        }
+        p {
+        margin: 0
+        }
+        .bigTable {
+        border-collapse: collapse;
+        width: 100%;
+        }
+        tr:nth-child(odd) {
+        background-color: #f2f2f2
+        }
+        th {
+        background-color: #d4d4d4;
+        height: 35px;
+        color: black;
+        }
+        page[size="A4"] {
+        background: white;
+        width: 21cm;
+        height: """+(29.7 * pageCount ).toString() +"""cm;
+        display: block;
+        padding: 1cm;
+        position: relative;
+        }
+        @media print {
+        body,
+        page[size="A4"] {
+        margin: 0;
+        box-shadow: 0;
+        }
+        }
+    </style>
+</head>
+
+<body>
+    <page size="A4">
+        <div>
+            <h3>Mama Menage</h3>
+            <p>COP IMO EL BAHDJA N 02 REGHAIA</p>
+            <p>ALGER</p>
+        </div>
+        <div style="margin-top: 0.5cm;" id="infoTable">
+            <div style="float: left;">
+                <p>N RC :      06/00-5112684 A16</p>
+                <p>N FISCALE : 178160601093118</p>
+                <p>N ART :     16430745011</p>
+            </div>
+            <div style="float: right; border:2px solid black; padding: 5px; padding-bottom:0px; border-radius: 10px">
+              """+clientBody+"""
+            </div>
+        </div>
+        </hr>
+        <h1 style="margin-top: 1cm; padding-top: 0.2cm; clear: both;">Facture</h1>
+        <table style="margin-top: 0.5cm; width: 400px; height: 50px;">
+            <tbody>
+                <tr>
+                    <th style="text-align:left;width:37.0mm;">
+                        <b>Numero du Facture</b>
+                    </th>
+                    <th style="text-align:left;width:40.0mm;">
+                        <b>Date</b>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <center>{{factureNbr}}</center>
+                    </td>
+                    <td>
+                        <center>{{factureDate}}</center>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="bigTable" style="margin-top: 0.5cm;" border="1">
+            <tbody>
+                <tr>
+                    <th style="width: 5%"><b> N°<br></b></th>
+                    <th style="width: 50%"><b>Designtion<br></b></th>
+                    <th style="width: 5%"><b>Q.P<br></b></th>
+                    <th style="width: 5%"><b>QUANTITE<br></b></th>
+                    <th style="width: 15%"><b>Prix HT<br></b></th>
+                    <th style="width: 5%"><b>TV(%)<br></b></th>
+                    <th style="width: 15%"><b>Total HT<br></b></th>
+                </tr>
+""" + tableBody +"""
+            </tbody>
+        </table>
+        <div style="position: absolute; bottom: """+(19 - currentFacture.products.length).toString()+"""cm; left: 1cm;word-wrap: break-word;width: 50%;">
+            <p>Cette facture est arretee au montant :</p>
+            <p><b>{{totalLetters}}</b></p>
+            <p>Mode de paiment : <b>{{paimentMode}}</b></p>
+        </div>
+        <table style="position: absolute; bottom: """+(15 - currentFacture.products.length).toString()+"""cm; right: 1cm; border-collapse: collapse;border: 1px solid black; background-color: #f2f2f2">
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>HORS TAXE (DA): </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p>"""+total.toString()+ """ DZD</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>REMISE (DA) (0.00%): </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p> 0.00</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>MONTAN, HORS TAXE (DA) : </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p> 0</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>T.V.A (DA) : </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p> """ + (total * 0.19).toString() +"""</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>TIMBRE (DA) : </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p> 26</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b class="T3">R.T.A (DA):</b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p>0.00</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;width:37.84mm; ">
+                    <p><b>MONTANT T.T.C (DA): </b></p>
+                </td>
+                <td style="text-align:right;width:44.01mm; ">
+                    <p>"""+(26 + total * 1.19).toString()+ """ DZD</p>
+                </td>
+            </tr>
+        </table>
+    </page>
+</body>
+
+</html>
+
+""";
+
+
+return htmlContent; 
+  }
   //EXTRA
   void flushbar({context, title, message, color = Colors.green}) {
     if (context == null) return;

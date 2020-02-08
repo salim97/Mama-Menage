@@ -46,17 +46,46 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     final longSize = landscape ? windowsSize.width : windowsSize.height;
     return Scaffold(
         appBar: AppBar(
-               flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
-       
+          flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
           title: Text(product.name),
           actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  // add
-                })
+            product.selectedQP == null
+                ? IconButton(
+                    icon: Icon(Icons.check, color: Colors.white),
+                    onPressed: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                              elevation: 16,
+                              title: Text("Sélectionnez la quantité dans l'emballage"),
+                              content: Container(
+                                  height: 400.0,
+                                  width: 360.0,
+                                  child: ListView.builder(
+                                      itemCount: product.qp.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return FlatButton(
+                                          child: Text(product.qp.elementAt(index).toString()),
+                                          onPressed: () {
+                                            product.selectedQP = product.qp.elementAt(index);
+                                            product.selectedProduct = true;
+                                            myAppState.notifyListeners();
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        );
+                                      })),
+                            );
+                          });
+
+                      Navigator.of(context).pop();
+                      // product.selectedProduct = true ;
+                      // myAppState.notifyListeners();
+                    })
+                : Container()
           ],
         ),
         body: Padding(

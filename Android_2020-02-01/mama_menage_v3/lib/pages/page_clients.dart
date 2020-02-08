@@ -168,11 +168,11 @@ class _Page_ClientsState extends State<Page_Clients> {
   sortClient _sortClient = sortClient.name_ascending;
   var sortList = [
     {
-      "display": "Name - Ascendant",
+      "display": "Nom - Ascendant",
       "value": sortClient.name_ascending,
     },
     {
-      "display": "Name - Descendant",
+      "display": "Nom - Descendant",
       "value": sortClient.name_descending,
     },
     {

@@ -124,17 +124,22 @@ class _Page_HistoryState extends State<Page_History> {
     );
   }
 
-  final c_numero = TextEditingController();
+  final c_nom_de_client = TextEditingController();
+  final c_datetime = TextEditingController();
 
   onApplyFilter() async {
+    String temp;
     setState(() {
       _listData.clear();
       myAppState.factures.forEach((p) {
-        if (c_numero.text.isEmpty) {
+
+    temp = new DateTime.fromMillisecondsSinceEpoch(int.parse(p.createdAt)).toString();
+
+        if (c_nom_de_client.text.isEmpty && c_datetime.text.isEmpty) {
           _listData.add(p);
           return;
         }
-        if (p.createdAt.toLowerCase().contains(c_numero.text.toLowerCase())) {
+        if (p.client.name.toLowerCase().contains(c_nom_de_client.text.toLowerCase()) &&  temp.toLowerCase().contains(c_datetime.text.toLowerCase())) {
           _listData.add(p);
         }
 
@@ -156,11 +161,11 @@ class _Page_HistoryState extends State<Page_History> {
   sortCommande _sortClient = sortCommande.numero_ascending;
   var sortList = [
     {
-      "display": "Numero de commande - Ascendant",
+      "display": "Date Heure - Ascendant",
       "value": sortCommande.numero_ascending,
     },
     {
-      "display": "Numero de commande - Descendant",
+      "display": "Date Heure - Descendant",
       "value": sortCommande.numero_descending,
     },
   ];
@@ -214,17 +219,41 @@ class _Page_HistoryState extends State<Page_History> {
                           focusedGradient: myGradient,
                           unfocusedGradient: myGradient,
                         ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
+                        labelText: "Nom de Client",
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                c_numero.text = "";
+                                c_nom_de_client.text = "";
                               });
                               onApplyFilter();
                             })),
-                    keyboardType: TextInputType.number,
-                    controller: c_numero,
+                    keyboardType: TextInputType.text,
+                    controller: c_nom_de_client,
+                    onChanged: (query) {
+                      onApplyFilter();
+                    },
+                  )),
+              Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: new TextFormField(
+                    style: new TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
+                        labelText: "Date Heure",
+                        suffixIcon: IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                c_datetime.text = "";
+                              });
+                              onApplyFilter();
+                            })),
+                    keyboardType: TextInputType.datetime,
+                    controller: c_datetime,
                     onChanged: (query) {
                       onApplyFilter();
                     },

@@ -24,19 +24,58 @@ class _CardItemsState extends State<CardItems> {
   Size windowsSize;
   ModelProduct get product => myAppState.products.elementAt(widget.index);
   onDetails() {
-  Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => new Page_Products_Details(
-                              index: widget.index,
-                            )));
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (BuildContext context) => new Page_Products_Details(
+              index: widget.index,
+            )));
   }
+
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
     windowsSize = MediaQuery.of(context).size;
     return GestureDetector(
-      onTap: () {
-        product.selectedProduct = !product.selectedProduct;
-        myAppState.notifyListeners();
+      onTap: () async {
+        if (product.selectedQP == null) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                  elevation: 16,
+                  title: Text("Sélectionnez la quantité dans l'emballage"),
+                  content: Container(
+                      height: 400.0,
+                      width: 360.0,
+                      child: ListView.builder(
+                          itemCount: product.qp.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return FlatButton(
+                              child: Text(product.qp.elementAt(index).toString()),
+                              onPressed: () {
+                                product.selectedQP = product.qp.elementAt(index);
+                                product.selectedProduct = true;
+                                myAppState.notifyListeners();
+                                Navigator.of(context).pop(true);
+                              },
+                            );
+                          })),
+                );
+              });
+        } else {
+          product.selectedProduct = false;
+          product.selectedQP = null;
+          myAppState.notifyListeners();
+          //Navigator.of(context).pop(true);
+        }
+        // if(returnOfNavigator == null) return ;
+
+        //   if (old == product.selectedQP) {
+
+        //   }
+        //   else
+        //   product.selectedProduct = false ; //!product.selectedProduct;
+        //    myAppState.notifyListeners();
       },
       onLongPress: onDetails,
       child: Padding(
@@ -60,30 +99,25 @@ class _CardItemsState extends State<CardItems> {
                 child: Image(
                   image: DEV_MODE
                       ? AssetImage(product.imagePath.first)
-                      : AdvancedNetworkImage(
-                          product.imagePath.first,
+                      : AdvancedNetworkImage(product.imagePath.first,
                           // header: header,
                           loadedCallback: () {
-                            print(product.imagePath.first);
-                            print('It works!');
-                          },
-                          loadFailedCallback: () {
-                            print(product.imagePath.first);
-                            print('Oh, no!');
-                            product.imagePath[0] = BLACK_IMAGE ;
-                            myAppState.notifyListeners();
-                          },
-                          loadingProgress: (progress, list) {
-                            print('Now Loading: $progress');
-                          },
-                          loadedFromDiskCacheCallback: () {
-                            print('Now loadedFromDiskCacheCallback: ');
-                          },
+                          print(product.imagePath.first);
+                          print('It works!');
+                        }, loadFailedCallback: () {
+                          print(product.imagePath.first);
+                          print('Oh, no!');
+                          product.imagePath[0] = BLACK_IMAGE;
+                          myAppState.notifyListeners();
+                        }, loadingProgress: (progress, list) {
+                          print('Now Loading: $progress');
+                        }, loadedFromDiskCacheCallback: () {
+                          print('Now loadedFromDiskCacheCallback: ');
+                        },
                           useDiskCache: true,
                           cacheRule: CacheRule(maxAge: const Duration(days: 7)),
                           timeoutDuration: const Duration(seconds: 1),
-                          retryLimit: 1
-                        ),
+                          retryLimit: 1),
                   fit: BoxFit.fill,
                   // height: windowsSize.height * 0.75,
                   // width: windowsSize.width,

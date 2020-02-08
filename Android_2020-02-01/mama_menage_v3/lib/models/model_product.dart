@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ModelProduct {
   // remote
   List<String> imagePath;
+  List<int> qp;
   String code;
   String name;
   String mark;
@@ -14,6 +15,7 @@ class ModelProduct {
 
   //local
   int selectedQuantity = 1;
+  int selectedQP = null ;
   bool checked;
   bool selectedProduct = false ;
   get total => quantity * cost;
@@ -42,6 +44,14 @@ class ModelProduct {
     a.forEach((e) {
       tmp.imagePath.add(e);
     });
+
+    List<dynamic> b = json['qp'];
+    if( b == null ) return null ;
+    tmp.qp = new List<int>();
+    b.forEach((e) {
+      tmp.qp.add(e);
+    });
+    
     return tmp;
     // return ModelProduct()
     //   ..name = json['name'] as String
@@ -59,6 +69,7 @@ class ModelProduct {
       'detail': detail,
       'createdAt': createdAt,
       'quantite': selectedQuantity,
+      'selectedQP': selectedQP,
       'price': cost,
       'total': total
     };

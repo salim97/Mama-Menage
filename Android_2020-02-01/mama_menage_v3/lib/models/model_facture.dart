@@ -30,6 +30,7 @@ tmp.products= new List<ModelProduct>();
         t.createdAt = j['createdAt'] as String;
         t.quantity = j['quantite'] as num;
         t.cost = j['price'] as num;
+        t.selectedQP = j['selectedQP'] as num;
 
         tmp.products.add(t);
     });
