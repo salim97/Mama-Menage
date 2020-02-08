@@ -64,9 +64,9 @@ class _MyListTileState extends State<MyListTile> {
                           print( product.imagePath.first);
                           print('Oh, no!');
                         },
-                        loadingProgress: (progress, list) {
-                          print('Now Loading: $progress');
-                        },
+                        // loadingProgress: (progress, list) {
+                        //   print('Now Loading: $progress');
+                        // },
                         loadedFromDiskCacheCallback: () {
                           print('Now loadedFromDiskCacheCallback: ');
                         },

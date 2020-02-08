@@ -19,7 +19,7 @@ enum sortClient {
 
 class Page_Clients extends StatefulWidget {
   Page_Clients({Key key}) : super(key: key);
-  
+
   @override
   _Page_ClientsState createState() => _Page_ClientsState();
 }
@@ -54,8 +54,6 @@ class _Page_ClientsState extends State<Page_Clients> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     windowsSize = MediaQuery.of(context).size;
@@ -63,18 +61,14 @@ class _Page_ClientsState extends State<Page_Clients> {
 
     final drawerWidth = windowsSize.width * 0.25;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
-    return  Scaffold(
-      
-        
-        
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-                right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
-            Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
-          ],
-        ),
-      
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+              right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
+          Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
+        ],
+      ),
     );
   }
 
@@ -110,14 +104,17 @@ class _Page_ClientsState extends State<Page_Clients> {
             title: Text(_listData.elementAt(index).name),
             subtitle: Text(_listData.elementAt(index).address),
             leading: CircleAvatar(
-              // backgroundColor: Colors.brown.shade800,
-              child: Text(_listData.elementAt(index).name[0].toUpperCase()),
+              backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
+              child: Text(
+                _listData.elementAt(index).name[0].toUpperCase(),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             onTap: () {
               myAppState.products.forEach((p) => p.selectedProduct = false);
               myAppState.client = _listData.elementAt(index);
               myAppState.notifyListeners();
-              myAppState.goNextTab() ;
+              myAppState.goNextTab();
               // Navigator.of(context)
               //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
             },
@@ -226,14 +223,20 @@ class _Page_ClientsState extends State<Page_Clients> {
           child: Column(
             children: <Widget>[
               Padding(
+                  padding: EdgeInsets.all(18.0),
+                  child: Text("Client : " + myAppState.user.name,  
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),)
+              ),
+              Divider(),
+              Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      border: GradientOutlineInputBorder(
-                                    focusedGradient: myGradient,
-                                    unfocusedGradient: myGradient,
-                                  ),
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
@@ -254,10 +257,10 @@ class _Page_ClientsState extends State<Page_Clients> {
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      border: GradientOutlineInputBorder(
-                                    focusedGradient: myGradient,
-                                    unfocusedGradient: myGradient,
-                                  ),
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
@@ -288,7 +291,6 @@ class _Page_ClientsState extends State<Page_Clients> {
             ],
           ),
         ),
-        
       ],
     );
   }

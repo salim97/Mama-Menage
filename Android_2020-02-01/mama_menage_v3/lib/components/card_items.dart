@@ -36,46 +36,9 @@ class _CardItemsState extends State<CardItems> {
     windowsSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () async {
-        if (product.selectedQP == null) {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                  elevation: 16,
-                  title: Text("Sélectionnez la quantité dans l'emballage"),
-                  content: Container(
-                      height: 400.0,
-                      width: 360.0,
-                      child: ListView.builder(
-                          itemCount: product.qp.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return FlatButton(
-                              child: Text(product.qp.elementAt(index).toString()),
-                              onPressed: () {
-                                product.selectedQP = product.qp.elementAt(index);
-                                product.selectedProduct = true;
-                                myAppState.notifyListeners();
-                                Navigator.of(context).pop(true);
-                              },
-                            );
-                          })),
-                );
-              });
-        } else {
-          product.selectedProduct = false;
-          product.selectedQP = null;
-          myAppState.notifyListeners();
-          //Navigator.of(context).pop(true);
-        }
-        // if(returnOfNavigator == null) return ;
-
-        //   if (old == product.selectedQP) {
-
-        //   }
-        //   else
-        //   product.selectedProduct = false ; //!product.selectedProduct;
-        //    myAppState.notifyListeners();
+        product.selectedQP = product.qp.first;
+        product.selectedProduct = !product.selectedProduct;
+        myAppState.notifyListeners();
       },
       onLongPress: onDetails,
       child: Padding(
@@ -109,9 +72,11 @@ class _CardItemsState extends State<CardItems> {
                           print('Oh, no!');
                           product.imagePath[0] = BLACK_IMAGE;
                           myAppState.notifyListeners();
-                        }, loadingProgress: (progress, list) {
-                          print('Now Loading: $progress');
-                        }, loadedFromDiskCacheCallback: () {
+                        },
+                          // loadingProgress: (progress, list) {
+                          //   print('Now Loading: $progress');
+                          // },
+                          loadedFromDiskCacheCallback: () {
                           print('Now loadedFromDiskCacheCallback: ');
                         },
                           useDiskCache: true,
@@ -139,13 +104,6 @@ class _CardItemsState extends State<CardItems> {
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ),
-                      product.selectedQP != null ? Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "QP = " + product.selectedQP.toString(),
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ) : Container( ),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(

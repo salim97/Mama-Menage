@@ -12,6 +12,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as w;
+import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -47,8 +48,11 @@ class _Page_ValidationState extends State<Page_Validation> {
       }
 
       _textEditingController.text = textOutput;
+          onHTMLtoPDF();
       return;
     }
+
+
     //     Future.delayed(Duration(seconds: 1)).then((_) async {
     //   myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
     //   //readProducts();
@@ -71,22 +75,27 @@ class _Page_ValidationState extends State<Page_Validation> {
 
     // _textEditingController.text = textOutput;
   }
-  
+
   onHTMLtoPDF() async {
+    // Directory tempDir = await getApplicationDocumentsDirectory();
+    // Directory tempDir = await getDownloadsDirectory();
+    Directory tempDir = await getTemporaryDirectory();
+      print(myAppState.currentFactureToHTML()) ;
 
-    Directory tempDir = await getApplicationDocumentsDirectory();
-
-var targetPath = tempDir.path;
-var targetFileName = "example_pdf_file" ;
-File generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
-    myAppState.currentFactureToHTML(), targetPath, targetFileName);
-  
-     OpenFile.open(targetPath + '/example_pdf_file.pdf');
+    var targetPath = tempDir.path;
+    var targetFileName = "example_pdf_file";
+    File generatedPdfFile =
+        await FlutterHtmlToPdf.convertFromHtmlContent(myAppState.currentFactureToHTML(), targetPath, targetFileName);
+    setState(() {
+    _pdf_path = targetPath + '/example_pdf_file.pdf';
+    print(_pdf_path) ;
+    });
   }
 
   onPDF() async {
     await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-onHTMLtoPDF();
+    await onHTMLtoPDF();
+    OpenFile.open(_pdf_path);
   }
 
   onGMAIL() async {
@@ -118,24 +127,12 @@ onHTMLtoPDF();
           if (selected == null) return;
           if (!selected.contains("@")) return;
 
-          String textOutput = "";
-          textOutput += "Commande numero XX \n";
-
-          myAppState.selectedProducts?.forEach((p) {
-            if (p.checked) {
-              textOutput += "\nproduct name = " + p.name;
-              textOutput += "\nproduct cost = " + p.cost.toString();
-              textOutput += "\nproduct quantity = " + p.quantity.toString();
-              textOutput += "\nproduct total price = " + p.total.toString();
-              textOutput += "\n-----------------------------------------";
-            }
-          });
-          textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
 
           final Email email = Email(
             recipients: [selected],
-            body: textOutput,
-            subject: 'LA FACTEEEEUUUURR',
+            body: "",
+            subject: 'Commande '+myAppState.currentFacture.createdAt,
+            attachmentPath: _pdf_path,
             isHTML: false,
           );
 
@@ -143,6 +140,7 @@ onHTMLtoPDF();
         });
   }
 
+  String _pdf_path = "";
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
@@ -162,12 +160,11 @@ onHTMLtoPDF();
           child: Column(
             children: <Widget>[
               Expanded(
-                child: TextField(
-                  controller: _textEditingController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                ),
-              ),
+                  child: _pdf_path.isEmpty
+                      ? Container()
+                      : PdfViewer(
+                          filePath: _pdf_path,
+                        )),
               Row(
                 children: <Widget>[
                   Expanded(child: Container()),

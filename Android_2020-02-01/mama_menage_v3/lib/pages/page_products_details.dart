@@ -51,35 +51,13 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                   gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
           title: Text(product.name),
           actions: <Widget>[
-            product.selectedQP == null
+            product.selectedProduct == false
                 ? IconButton(
                     icon: Icon(Icons.check, color: Colors.white),
                     onPressed: () async {
-                      await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                              elevation: 16,
-                              title: Text("Sélectionnez la quantité dans l'emballage"),
-                              content: Container(
-                                  height: 400.0,
-                                  width: 360.0,
-                                  child: ListView.builder(
-                                      itemCount: product.qp.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return FlatButton(
-                                          child: Text(product.qp.elementAt(index).toString()),
-                                          onPressed: () {
-                                            product.selectedQP = product.qp.elementAt(index);
-                                            product.selectedProduct = true;
-                                            myAppState.notifyListeners();
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        );
-                                      })),
-                            );
-                          });
+                      product.selectedQP = product.qp.first;
+                      product.selectedProduct = true;
+                      myAppState.notifyListeners();
 
                       Navigator.of(context).pop();
                       // product.selectedProduct = true ;
@@ -101,6 +79,7 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        enabled: false,
                         decoration: new InputDecoration(
                           enabledBorder: const OutlineInputBorder(
                             borderSide: const BorderSide(color: Colors.grey, width: 0.0),
@@ -159,9 +138,9 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                           print(product.imagePath.first);
                           print('Oh, no!');
                         },
-                        loadingProgress: (progress, list) {
-                          print('Now Loading: $progress');
-                        },
+                        // loadingProgress: (progress, list) {
+                        //   print('Now Loading: $progress');
+                        // },
                         loadedFromDiskCacheCallback: () {
                           print('Now loadedFromDiskCacheCallback: ');
                         },

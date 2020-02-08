@@ -54,7 +54,7 @@ android {
             minifyEnabled true
         }
         // debug{
-            // minifyEnabled true
+        //     minifyEnabled true
         // }
     }
 }

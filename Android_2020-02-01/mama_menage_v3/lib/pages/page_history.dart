@@ -108,8 +108,11 @@ class _Page_HistoryState extends State<Page_History> {
                 " ) "),
             subtitle: Text(_listData.elementAt(index).client.name + " " + _listData.elementAt(index).user.name),
             leading: CircleAvatar(
-              // backgroundColor: Colors.brown.shade800,
-              child: Text(_listData.elementAt(index).client.name[0].toUpperCase()),
+              backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
+              child: Text(
+                _listData.elementAt(index).client.name[0].toUpperCase(),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             onTap: () {
               myAppState.currentFacture = _listData.elementAt(index);
@@ -132,14 +135,14 @@ class _Page_HistoryState extends State<Page_History> {
     setState(() {
       _listData.clear();
       myAppState.factures.forEach((p) {
-
-    temp = new DateTime.fromMillisecondsSinceEpoch(int.parse(p.createdAt)).toString();
+        temp = new DateTime.fromMillisecondsSinceEpoch(int.parse(p.createdAt)).toString();
 
         if (c_nom_de_client.text.isEmpty && c_datetime.text.isEmpty) {
           _listData.add(p);
           return;
         }
-        if (p.client.name.toLowerCase().contains(c_nom_de_client.text.toLowerCase()) &&  temp.toLowerCase().contains(c_datetime.text.toLowerCase())) {
+        if (p.client.name.toLowerCase().contains(c_nom_de_client.text.toLowerCase()) &&
+            temp.toLowerCase().contains(c_datetime.text.toLowerCase())) {
           _listData.add(p);
         }
 
