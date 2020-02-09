@@ -139,9 +139,8 @@ class _Page_ValidationState extends State<Page_Validation> {
           child: Column(
             children: <Widget>[
               Expanded(
-                  child: _pdf_path.isEmpty
-                      ? Center(child: CircularProgressIndicator())
-                      : Center(
+                  child: 
+                       Center(
                           child: WebView(
         initialUrl: 'about:blank',
         onWebViewCreated: (WebViewController webViewController) {
