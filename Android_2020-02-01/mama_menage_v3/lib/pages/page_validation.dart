@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,9 +11,9 @@ import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class Page_Validation extends StatefulWidget {
   Page_Validation({Key key}) : super(key: key);
@@ -111,6 +112,14 @@ class _Page_ValidationState extends State<Page_Validation> {
   static const padding = 1.0;
   static const wmargin = (margin + padding) * 2;
 
+  WebViewController _controller;
+  _loadHtmlFromAssets() async {
+    _controller.loadUrl( Uri.dataFromString(
+        myAppState.currentFactureToHTML(),
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8')
+    ).toString());
+  }
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
@@ -133,23 +142,15 @@ class _Page_ValidationState extends State<Page_Validation> {
                   child: _pdf_path.isEmpty
                       ? Center(child: CircularProgressIndicator())
                       : Center(
-                          child: PdfDocumentLoader(
-                          filePath: _pdf_path,
-                          documentBuilder: (context, pdfDocument, pageCount) => LayoutBuilder(
-                              builder: (context, constraints) => ListView.builder(
-                                  itemCount: pageCount,
-                                  itemBuilder: (context, index) => Container(
-                                      margin: EdgeInsets.all(margin),
-                                      padding: EdgeInsets.all(padding),
-                                      color: Colors.black12,
-                                      child: PdfPageView(
-                                          pdfDocument: pdfDocument,
-                                          pageNumber: index + 1,
-                                          // calculateSize is used to calculate the rendering page size
-                                          calculateSize: (pageWidth, pageHeight, aspectRatio) => Size(
-                                              constraints.maxWidth - wmargin,
-                                              (constraints.maxWidth - wmargin) / aspectRatio))))),
-                        ))),
+                          child: WebView(
+        initialUrl: 'about:blank',
+        onWebViewCreated: (WebViewController webViewController) {
+          _controller = webViewController;
+          _loadHtmlFromAssets();
+        },
+      ),
+
+)),
               Row(
                 children: <Widget>[
                   Expanded(child: Container()),
