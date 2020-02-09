@@ -19,10 +19,10 @@ void main() => runApp(EasyLocalization(child: MyApp()));
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    //    SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight
-    // ]);
+       SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
     var data = EasyLocalizationProvider.of(context).data;
     return EasyLocalizationProvider(
       data: data,

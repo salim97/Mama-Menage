@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,28 +19,32 @@ void main() => runApp(EasyLocalization(child: MyApp()));
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-        var data = EasyLocalizationProvider.of(context).data;
+       SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
+    var data = EasyLocalizationProvider.of(context).data;
     return EasyLocalizationProvider(
-       data: data,
-          child: MultiProvider(
-         providers: [
-           ChangeNotifierProvider(create: (_) => MyAppState()),
+      data: data,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => MyAppState()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          //app-specific localization
-          EasylocaLizationDelegate(
-            locale: data.locale,
-            path: 'lang',
-            //useOnlyLangCode: true,
-            // loadPath: 'https://raw.githubusercontent.com/aissat/easy_localization/master/example/resources/langs'
-          ),
-        ],
-        supportedLocales: [Locale('fr', 'FR')],
-        locale: data.locale,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            //app-specific localization
+            EasyLocalizationDelegate(
+              locale: data.savedLocale,
+              path: 'lang',
+              //useOnlyLangCode: true,
+              // loadPath: 'https://raw.githubusercontent.com/aissat/easy_localization/master/example/resources/langs'
+            ),
+          ],
+          supportedLocales: [Locale('fr', 'FR')],
+          locale: data.locale,
           theme: ThemeData(
             primarySwatch: Colors.green,
           ),
@@ -51,3 +56,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class TestWeb extends StatelessWidget {
+  const TestWeb({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("test"),
+      ),
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}

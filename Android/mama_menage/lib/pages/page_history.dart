@@ -1,30 +1,26 @@
-import 'package:badges/badges.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_input_border/gradient_input_border.dart';
-import 'package:mama_menage_v3/models/model_client.dart';
+import 'package:mama_menage_v3/models/model_facture.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'page_all_products.dart';
+import 'page_validation.dart';
 
-enum sortClient {
-  name_ascending,
-  name_descending,
-  address_ascending,
-  address_descending,
+enum sortCommande {
+  numero_ascending,
+  numero_descending,
 }
 
-class Page_Clients extends StatefulWidget {
-  Page_Clients({Key key}) : super(key: key);
+class Page_History extends StatefulWidget {
+  Page_History({Key key}) : super(key: key);
 
   @override
-  _Page_ClientsState createState() => _Page_ClientsState();
+  _Page_HistoryState createState() => _Page_HistoryState();
 }
 
-class _Page_ClientsState extends State<Page_Clients> {
+class _Page_HistoryState extends State<Page_History> {
   MyAppState myAppState;
   Size windowsSize;
   @override
@@ -41,16 +37,21 @@ class _Page_ClientsState extends State<Page_Clients> {
     });
   }
 
+  List<ModelFacture> _listData = List<ModelFacture>();
   onRefresh() async {
+    myAppState.currentFacture = null;
+    myAppState.notifyListeners();
     if (myAppState.database == null) await myAppState.signInAnonymously();
-    await myAppState.getAllClients();
+    await myAppState.getAllCommandes();
     if (!mounted) {
       // dispose();
       return;
     }
     setState(() {
       _listData.clear();
-      myAppState.clients.forEach((p) => _listData.add(p));
+      myAppState.factures.forEach((p) {
+        if (p.user.name == myAppState.user.name) _listData.add(p);
+      });
     });
   }
 
@@ -60,7 +61,7 @@ class _Page_ClientsState extends State<Page_Clients> {
     myAppState = Provider.of<MyAppState>(context);
 
     final drawerWidth = windowsSize.width * 0.25;
-    final landscape = windowsSize.width > windowsSize.height ? true : false;
+
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -101,22 +102,24 @@ class _Page_ClientsState extends State<Page_Clients> {
         itemCount: _listData.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(_listData.elementAt(index).name),
-            subtitle: Text(_listData.elementAt(index).address),
+            title: Text(_listData.elementAt(index).createdAt +
+                " ( " +
+                new DateTime.fromMillisecondsSinceEpoch(int.parse(_listData.elementAt(index).createdAt)).toString() +
+                " ) "),
+            subtitle: Text(_listData.elementAt(index).client.name + " " + _listData.elementAt(index).user.name),
             leading: CircleAvatar(
               backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
               child: Text(
-                _listData.elementAt(index).name[0].toUpperCase(),
+                _listData.elementAt(index).client.name[0].toUpperCase(),
                 style: TextStyle(color: Colors.white),
               ),
             ),
             onTap: () {
-              myAppState.products.forEach((p) => p.selectedProduct = false);
-              myAppState.client = _listData.elementAt(index);
+              myAppState.currentFacture = _listData.elementAt(index);
               myAppState.notifyListeners();
-              myAppState.goNextTab();
-              // Navigator.of(context)
-              //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
+              Navigator.of(context)
+                  .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Validation()));
+              // TODO: open validation mode
             },
           );
         },
@@ -124,24 +127,22 @@ class _Page_ClientsState extends State<Page_Clients> {
     );
   }
 
-  final c_name = TextEditingController();
-  final c_address = TextEditingController();
+  final c_nom_de_client = TextEditingController();
+  final c_datetime = TextEditingController();
 
-  List<ModelClient> _listData = List<ModelClient>();
   onApplyFilter() async {
+    String temp;
     setState(() {
       _listData.clear();
-      myAppState.clients.forEach((p) {
-        if (c_name.text.isEmpty && c_address.text.isEmpty) {
+      myAppState.factures.forEach((p) {
+        temp = new DateTime.fromMillisecondsSinceEpoch(int.parse(p.createdAt)).toString();
+
+        if (c_nom_de_client.text.isEmpty && c_datetime.text.isEmpty) {
           _listData.add(p);
           return;
         }
-        if (p.name.toLowerCase().contains(c_name.text.toLowerCase()) &&
-            p.address.toLowerCase().contains(c_address.text.toLowerCase())) {
-          // print("ADD" + p.name);
-          // print(p.address.contains(c_address.text));
-          // print(p.name.contains(c_name.text));
-
+        if (p.client.name.toLowerCase().contains(c_nom_de_client.text.toLowerCase()) &&
+            temp.toLowerCase().contains(c_datetime.text.toLowerCase())) {
           _listData.add(p);
         }
 
@@ -155,30 +156,20 @@ class _Page_ClientsState extends State<Page_Clients> {
 
   onApplySort() {
     setState(() {
-      if (_sortClient == sortClient.name_ascending) _listData.sort((a, b) => a.name.compareTo(b.name));
-      if (_sortClient == sortClient.name_descending) _listData.sort((b, a) => a.name.compareTo(b.name));
-      if (_sortClient == sortClient.address_ascending) _listData.sort((a, b) => a.address.compareTo(b.address));
-      if (_sortClient == sortClient.address_descending) _listData.sort((b, a) => a.address.compareTo(b.address));
+      if (_sortClient == sortCommande.numero_ascending) _listData.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      if (_sortClient == sortCommande.numero_descending) _listData.sort((b, a) => a.createdAt.compareTo(b.createdAt));
     });
   }
 
-  sortClient _sortClient = sortClient.name_ascending;
+  sortCommande _sortClient = sortCommande.numero_ascending;
   var sortList = [
     {
-      "display": "Nom - Ascendant",
-      "value": sortClient.name_ascending,
+      "display": "Date Heure - Ascendant",
+      "value": sortCommande.numero_ascending,
     },
     {
-      "display": "Nom - Descendant",
-      "value": sortClient.name_descending,
-    },
-    {
-      "display": "Address - Ascendant",
-      "value": sortClient.address_ascending,
-    },
-    {
-      "display": "Address - Descendant",
-      "value": sortClient.address_descending,
+      "display": "Date Heure - Descendant",
+      "value": sortCommande.numero_descending,
     },
   ];
 
@@ -222,8 +213,6 @@ class _Page_ClientsState extends State<Page_Clients> {
           right: 0,
           child: Column(
             children: <Widget>[
-
-              Divider(),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
@@ -233,17 +222,17 @@ class _Page_ClientsState extends State<Page_Clients> {
                           focusedGradient: myGradient,
                           unfocusedGradient: myGradient,
                         ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
+                        labelText: "Nom de Client",
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                c_name.text = "";
+                                c_nom_de_client.text = "";
                               });
                               onApplyFilter();
                             })),
                     keyboardType: TextInputType.text,
-                    controller: c_name,
+                    controller: c_nom_de_client,
                     onChanged: (query) {
                       onApplyFilter();
                     },
@@ -257,17 +246,17 @@ class _Page_ClientsState extends State<Page_Clients> {
                           focusedGradient: myGradient,
                           unfocusedGradient: myGradient,
                         ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
+                        labelText: "Date Heure",
                         suffixIcon: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                c_address.text = "";
+                                c_datetime.text = "";
                               });
                               onApplyFilter();
                             })),
-                    keyboardType: TextInputType.text,
-                    controller: c_address,
+                    keyboardType: TextInputType.datetime,
+                    controller: c_datetime,
                     onChanged: (query) {
                       onApplyFilter();
                     },

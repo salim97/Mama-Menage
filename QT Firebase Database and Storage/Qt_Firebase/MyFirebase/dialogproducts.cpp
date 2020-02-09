@@ -124,8 +124,8 @@ QNetworkReply::NetworkError DialogProducts::uploadProducts(QList<Row_Product> pr
 
         if(timer->isActive())
             timer->stop();
-        else
-                return QNetworkReply::TimeoutError ;
+//        else
+//                return QNetworkReply::TimeoutError ;
 
     }
     close();
@@ -250,8 +250,8 @@ QNetworkReply::NetworkError DialogProducts::syncProducts(QList<Row_Product> prod
 
         if(timer->isActive())
             timer->stop();
-        else
-                return QNetworkReply::TimeoutError ;
+//        else
+//                return QNetworkReply::TimeoutError ;
 
     }
     close();

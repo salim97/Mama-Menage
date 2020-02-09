@@ -3,14 +3,15 @@ import 'package:easy_localization/easy_localization.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:mama_menage/components/card_categories.dart';
-import 'package:mama_menage/components/card_items.dart';
-import 'package:mama_menage/models/model_product.dart';
-import 'package:mama_menage/pages/page_login.dart';
-import 'package:mama_menage/pages/page_products_details.dart';
-import 'package:mama_menage/pages/page_settings.dart';
-import 'package:mama_menage/pages/page_validation.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:gradient_input_border/gradient_input_border.dart';
+import 'package:mama_menage_v3/components/card_categories.dart';
+import 'package:mama_menage_v3/components/card_items.dart';
+import 'package:mama_menage_v3/models/model_product.dart';
+import 'package:mama_menage_v3/pages/page_login.dart';
+import 'package:mama_menage_v3/pages/page_products_details.dart';
+import 'package:mama_menage_v3/pages/page_settings.dart';
+import 'package:mama_menage_v3/pages/page_validation.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -42,7 +43,6 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     // TODO: implement initState
     super.initState();
     myAppState = Provider.of<MyAppState>(context, listen: false);
-    
 
     //onRefresh();
     //_refreshController
@@ -57,9 +57,9 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   onRefresh() async {
     if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllProducts();
-    if(!mounted) {
+    if (!mounted) {
       // dispose();
-      return ;
+      return;
     }
     setState(() {
       _products.clear();
@@ -75,20 +75,15 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
     final drawerWidth = windowsSize.width * 0.25;
     final double itemHeight = (windowsSize.height - kToolbarHeight - 150) / 2;
     final double itemWidth = (windowsSize.width - drawerWidth) / 2;
-    final landscape = windowsSize.width > windowsSize.height ? true : false;
-    if (landscape)
-      return Scaffold(
-        appBar: appBar(),
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-                left: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
-            Positioned(top: 0, right: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
-          ],
-        ),
-      );
-    else
-      return Scaffold(appBar: appBar(), endDrawer: Drawer(child: filterPage()), body: body());
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+              right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
+          Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
+        ],
+      ),
+    );
   }
 
   Widget appBar() {
@@ -205,7 +200,8 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
       if (_sortProduct == sortProduct.name_descending) myAppState.products.sort((b, a) => a.name.compareTo(b.name));
       if (_sortProduct == sortProduct.price_ascending) myAppState.products.sort((a, b) => a.cost.compareTo(b.cost));
       if (_sortProduct == sortProduct.price_descending) myAppState.products.sort((b, a) => a.cost.compareTo(b.cost));
-      if (_sortProduct == sortProduct.createdAt_ascending) myAppState.products.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      if (_sortProduct == sortProduct.createdAt_ascending)
+        myAppState.products.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       if (_sortProduct == sortProduct.createdAt_descending)
         myAppState.products.sort((b, a) => a.createdAt.compareTo(b.createdAt));
     });
@@ -214,27 +210,27 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   sortProduct _sortProduct = sortProduct.name_ascending;
   var sortList = [
     {
-      "display": "Name - ascending",
+      "display": "Nom - Ascendant",
       "value": sortProduct.name_ascending,
     },
     {
-      "display": "Name - descending",
+      "display": "Nom - Descendant",
       "value": sortProduct.name_descending,
     },
     {
-      "display": "Price - ascending",
+      "display": "Prix - Ascendant",
       "value": sortProduct.price_ascending,
     },
     {
-      "display": "Price - descending",
+      "display": "Prix - Descendant",
       "value": sortProduct.price_descending,
     },
     {
-      "display": "Created At - ascending",
+      "display": "Créé à - Ascendant",
       "value": sortProduct.createdAt_ascending,
     },
     {
-      "display": "Created At - descending",
+      "display": "Créé à - Descendant",
       "value": sortProduct.createdAt_descending,
     },
   ];
@@ -279,41 +275,23 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
           right: 0,
           child: Column(
             children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.height * 0.20,
-                width: double.infinity,
-                decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          "assets/images/logo.png",
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
+              myAppState.client != null
+                  ? Padding(
+                      padding: EdgeInsets.all(18.0),
                       child: Text(
-                        myAppState.user?.name ?? "no data",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              RaisedButton.icon(
-                label: Text(AppLocalizations.of(context).tr("drawer_btn_sort"),),
-                icon: Icon(Icons.sort),
-                onPressed: onSort,
-              ),
+                        "Client : " + myAppState.client.name,
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ))
+                  : Container(),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new TextFormField(
                     style: new TextStyle(color: Colors.black),
                     decoration: InputDecoration(
+                        border: GradientOutlineInputBorder(
+                          focusedGradient: myGradient,
+                          unfocusedGradient: myGradient,
+                        ),
                         labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
                         //prefixIcon: Icon(Icons.email),
                         suffixIcon: IconButton(
@@ -330,36 +308,31 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
                       onApplyFilter();
                     },
                   )),
+              Divider(),
+              Align(
+                alignment: Alignment.center,
+                child: Text("Plus de filtres"),
+              ),
               RaisedButton.icon(
-                icon: Icon(Icons.settings),
-                label: Text(AppLocalizations.of(context).tr("drawer_btn_settings"),),
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Settings()));
-                },
-              )
+                label: Text(
+                  AppLocalizations.of(context).tr("drawer_btn_sort"),
+                ),
+                icon: Icon(Icons.sort),
+                onPressed: onSort,
+              ),
+              // RaisedButton.icon(
+              //   icon: Icon(Icons.settings),
+              //   label: Text(
+              //     AppLocalizations.of(context).tr("drawer_btn_settings"),
+              //   ),
+              //   onPressed: () {
+              //     Navigator.of(context)
+              //         .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Settings()));
+              //   },
+              // )
             ],
           ),
         ),
-        Positioned(
-          bottom: 100,
-          left: 0,
-          right: 0,
-          child: Align(
-            alignment: Alignment.center,
-            child: FlatButton.icon(
-              color: Colors.green,
-              label: Text(
-                AppLocalizations.of(context).tr("drawer_btn_signout"),
-                style: TextStyle(color: Colors.white),
-              ),
-              icon: Icon(Icons.exit_to_app, color: Colors.white),
-              onPressed: () {
-                myAppState.signOut();
-              },
-            ),
-          ),
-        )
       ],
     );
   }

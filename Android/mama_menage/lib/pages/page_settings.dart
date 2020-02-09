@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 
 class Page_Settings extends StatefulWidget {

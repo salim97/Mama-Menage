@@ -1,10 +1,10 @@
 import 'package:badges/badges.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:mama_menage/components/askUser.dart';
-import 'package:mama_menage/components/myListTile.dart';
-import 'package:mama_menage/models/model_product.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:mama_menage_v3/components/askUser.dart';
+import 'package:mama_menage_v3/components/myListTile.dart';
+import 'package:mama_menage_v3/models/model_product.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +45,10 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
     myAppState = Provider.of<MyAppState>(context);
     return Scaffold(
         appBar: AppBar(
+               flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
+       
           title: Text(AppLocalizations.of(context).tr('p_productsQuantiy_appBar_title')+" (" + myAppState.selectedProducts.length.toString() + ")"),
           actions: <Widget>[
             Badge(
@@ -59,7 +63,7 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
                   icon: Icon(Icons.restore_from_trash,
                       color: myAppState.counterSelectedProducts == 0 ? Colors.white : Colors.orange),
                   onPressed: () {
-                    MyDialogs.askuserYESNO(context, "Remove", "Are you sure you want to remove the items selected ?",
+                    MyDialogs.askuserYESNO(context, "Supprimer", "Voulez-vous vraiment supprimer les éléments sélectionnés?",
                         onYes: () async {
                       myAppState.selectedProducts.forEach((p) {
                         if (p.checked) p.selectedProduct = false;
@@ -108,7 +112,7 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
                           myAppState.notifyListeners();
                         },
                       ),
-                      Text("All", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      Text("Tout", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                       Expanded(
                         child: Container(),
                       ),

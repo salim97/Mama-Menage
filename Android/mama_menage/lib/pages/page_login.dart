@@ -2,7 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:gradient_input_border/gradient_input_border.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,7 +32,7 @@ class _Page_LoginState extends State<Page_Login> {
         //emailController.text = (prefs.getString('userName') ?? "");
       });
     });
-    // if (DEV_MODE) 
+    // if (DEV_MODE)
     {
       setState(() {
         emailController.text = "salim";
@@ -46,22 +47,21 @@ class _Page_LoginState extends State<Page_Login> {
 
     if (userName.isEmpty || password.isEmpty) {
       myAppState.flushbar(
-          context: context,
-           
-          message: AppLocalizations.of(context).tr('p_login_msg_field_empty'),
-          color: Colors.orange);
+          context: context, message: AppLocalizations.of(context).tr('p_login_msg_field_empty'), color: Colors.orange);
       return;
     }
     bool userFound = await myAppState.login(email: userName, password: password);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('userName', userName);
-    if (userFound ) {
+    if (userFound) {
       if (context == null) return;
-      myAppState.flushbar(context: context, message: AppLocalizations.of(context).tr('p_login_msg_success'), color: Colors.green);
-        // Navigator.of(context)
-                      // .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
+      myAppState.flushbar(
+          context: context, message: AppLocalizations.of(context).tr('p_login_msg_success'), color: Colors.green);
+      // Navigator.of(context)
+      // .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
     } else {
-      myAppState.flushbar(context: context, message: AppLocalizations.of(context).tr('p_login_msg_failed'), color: Colors.red);
+      myAppState.flushbar(
+          context: context, message: AppLocalizations.of(context).tr('p_login_msg_failed'), color: Colors.red);
     }
   }
 
@@ -82,7 +82,7 @@ class _Page_LoginState extends State<Page_Login> {
         children: <Widget>[
           Image.asset(
             //TODO update this
-            'assets/big_mama.png',
+            'assets/login_background.jpg',
             fit: BoxFit.fill,
             height: double.infinity,
             width: double.infinity,
@@ -90,9 +90,23 @@ class _Page_LoginState extends State<Page_Login> {
           Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [
-              Colors.white.withOpacity(1),
+              Colors.white.withOpacity(0.2),
               Colors.white.withOpacity(.6),
             ])),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Image.asset(
+                //TODO update this
+                'assets/logo.png',
+                fit: BoxFit.fill,
+                height: windowsSize.height * 0.4,
+                width: windowsSize.height * 0.4,
+              ),
+            ),
           ),
           LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
             return SingleChildScrollView(
@@ -101,18 +115,18 @@ class _Page_LoginState extends State<Page_Login> {
                   minHeight: viewportConstraints.maxHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: windowsSize.height * 0.1),
+                  padding: EdgeInsets.only(bottom: windowsSize.height * 0.05),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(),
-                      Text(
-                        AppLocalizations.of(context).tr('app_name'),
-                        style: TextStyle(
-                          fontSize: 27.0,
-                        ),
-                      ),
+                      // Text(
+                      //   AppLocalizations.of(context).tr('app_name'),
+                      //   style: TextStyle(
+                      //     fontSize: 27.0,
+                      //   ),
+                      // ),
                       SizedBox(
                         height: 4,
                       ),
@@ -133,6 +147,10 @@ class _Page_LoginState extends State<Page_Login> {
                               width: windowsSize.width / 2,
                               child: new TextFormField(
                                 decoration: InputDecoration(
+                                  border: GradientOutlineInputBorder(
+                                    focusedGradient: myGradient,
+                                    unfocusedGradient: myGradient,
+                                  ),
                                   labelText: AppLocalizations.of(context).tr('p_login_label_username'),
                                   prefixIcon: Icon(Icons.email),
                                 ),
@@ -150,6 +168,10 @@ class _Page_LoginState extends State<Page_Login> {
                             width: windowsSize.width / 2,
                             child: new TextFormField(
                               decoration: InputDecoration(
+                                border: GradientOutlineInputBorder(
+                                  focusedGradient: myGradient,
+                                  unfocusedGradient: myGradient,
+                                ),
                                 labelText: AppLocalizations.of(context).tr('p_login_label_password'),
                                 prefixIcon: Icon(Icons.lock),
                                 suffixIcon: IconButton(
@@ -183,27 +205,25 @@ class _Page_LoginState extends State<Page_Login> {
                             visiblelogin = false;
                           });
                           await login();
-                          if(mounted)
-                          setState(() {
-                            visiblelogin = true;
-                          });
+                          if (mounted)
+                            setState(() {
+                              visiblelogin = true;
+                            });
                         },
                         child: visiblelogin
                             ? Container(
                                 height: 50,
                                 width: windowsSize.width / 3,
-                                decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(50)),
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: myTheme), borderRadius: BorderRadius.circular(50)),
                                 margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
                                 child: Center(
                                     child: Text(
-                                 AppLocalizations.of(context).tr('p_login_btn'),
+                                  AppLocalizations.of(context).tr('p_login_btn'),
                                   style: TextStyle(fontSize: 16, color: Colors.white),
                                 )),
                               )
                             : CircularProgressIndicator(),
-                      ),
-                      SizedBox(
-                        height: 10,
                       ),
                     ],
                   ),

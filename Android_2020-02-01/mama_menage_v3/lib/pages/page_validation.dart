@@ -39,9 +39,9 @@ class _Page_ValidationState extends State<Page_Validation> {
 
   onHTMLtoPDF() async {
     await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    Directory tempDir = await getApplicationDocumentsDirectory();
+    // Directory tempDir = await getApplicationDocumentsDirectory();
     // Directory tempDir = await getDownloadsDirectory();
-    // Directory tempDir = await getTemporaryDirectory();
+    Directory tempDir = await getTemporaryDirectory();
 
     var targetPath = tempDir.path;
     var targetFileName = "example_pdf_file7";

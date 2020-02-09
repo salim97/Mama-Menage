@@ -1,9 +1,10 @@
 import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
-import 'package:mama_menage/components/myListTile.dart';
-import 'package:mama_menage/models/model_product.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
+import 'package:mama_menage_v3/components/myListTile.dart';
+import 'package:mama_menage_v3/models/model_product.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -45,13 +46,24 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     final longSize = landscape ? windowsSize.width : windowsSize.height;
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: myTheme))),
           title: Text(product.name),
           actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  // add
-                })
+            product.selectedProduct == false
+                ? IconButton(
+                    icon: Icon(Icons.check, color: Colors.white),
+                    onPressed: () async {
+                      product.selectedQP = product.qp.first;
+                      product.selectedProduct = true;
+                      myAppState.notifyListeners();
+
+                      Navigator.of(context).pop();
+                      // product.selectedProduct = true ;
+                      // myAppState.notifyListeners();
+                    })
+                : Container()
           ],
         ),
         body: Padding(
@@ -67,6 +79,7 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        enabled: false,
                         decoration: new InputDecoration(
                           enabledBorder: const OutlineInputBorder(
                             borderSide: const BorderSide(color: Colors.grey, width: 0.0),
@@ -114,25 +127,25 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
                   //     fit: BoxFit.fill,
                   //   )
                   : Image(
-                      image: NetworkImage(
+                      image: AdvancedNetworkImage(
                         p,
                         // header: header,
-                        // loadedCallback: () {
-                        //   print(product.imagePath.first);
-                        //   print('It works!');
-                        // },
-                        // loadFailedCallback: () {
-                        //   print(product.imagePath.first);
-                        //   print('Oh, no!');
-                        // },
+                        loadedCallback: () {
+                          print(product.imagePath.first);
+                          print('It works!');
+                        },
+                        loadFailedCallback: () {
+                          print(product.imagePath.first);
+                          print('Oh, no!');
+                        },
                         // loadingProgress: (progress, list) {
                         //   print('Now Loading: $progress');
                         // },
-                        // loadedFromDiskCacheCallback: () {
-                        //   print('Now loadedFromDiskCacheCallback: ');
-                        // },
-                        // useDiskCache: true,
-                        // cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                        loadedFromDiskCacheCallback: () {
+                          print('Now loadedFromDiskCacheCallback: ');
+                        },
+                        useDiskCache: true,
+                        cacheRule: CacheRule(maxAge: const Duration(days: 7)),
                       ),
                       fit: BoxFit.fill,
                     )

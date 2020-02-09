@@ -1,9 +1,10 @@
 import 'package:fleva_icons/fleva_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mama_menage/models/model_product.dart';
-import 'package:mama_menage/pages/page_products_details.dart';
-import 'package:mama_menage/providers/my_app_state.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
+import 'package:mama_menage_v3/models/model_product.dart';
+import 'package:mama_menage_v3/pages/page_products_details.dart';
+import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:provider/provider.dart';
 
 class CardItems extends StatefulWidget {
@@ -23,17 +24,19 @@ class _CardItemsState extends State<CardItems> {
   Size windowsSize;
   ModelProduct get product => myAppState.products.elementAt(widget.index);
   onDetails() {
-  Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => new Page_Products_Details(
-                              index: widget.index,
-                            )));
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (BuildContext context) => new Page_Products_Details(
+              index: widget.index,
+            )));
   }
+
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
     windowsSize = MediaQuery.of(context).size;
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        product.selectedQP = product.qp.first;
         product.selectedProduct = !product.selectedProduct;
         myAppState.notifyListeners();
       },
@@ -59,30 +62,27 @@ class _CardItemsState extends State<CardItems> {
                 child: Image(
                   image: DEV_MODE
                       ? AssetImage(product.imagePath.first)
-                      : NetworkImage(
-                          product.imagePath.first,
+                      : AdvancedNetworkImage(product.imagePath.first,
                           // header: header,
-                          // loadedCallback: () {
-                          //   print(product.imagePath.first);
-                          //   print('It works!');
-                          // },
-                          // loadFailedCallback: () {
-                          //   print(product.imagePath.first);
-                          //   print('Oh, no!');
-                          //   product.imagePath[0] = BLACK_IMAGE ;
-                          //   myAppState.notifyListeners();
-                          // },
+                          loadedCallback: () {
+                          print(product.imagePath.first);
+                          print('It works!');
+                        }, loadFailedCallback: () {
+                          print(product.imagePath.first);
+                          print('Oh, no!');
+                          product.imagePath[0] = BLACK_IMAGE;
+                          myAppState.notifyListeners();
+                        },
                           // loadingProgress: (progress, list) {
                           //   print('Now Loading: $progress');
                           // },
-                          // loadedFromDiskCacheCallback: () {
-                          //   print('Now loadedFromDiskCacheCallback: ');
-                          // },
-                          // useDiskCache: true,
-                          // cacheRule: CacheRule(maxAge: const Duration(days: 7)),
-                          // timeoutDuration: const Duration(seconds: 1),
-                          // retryLimit: 1
-                        ),
+                          loadedFromDiskCacheCallback: () {
+                          print('Now loadedFromDiskCacheCallback: ');
+                        },
+                          useDiskCache: true,
+                          cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                          timeoutDuration: const Duration(seconds: 1),
+                          retryLimit: 1),
                   fit: BoxFit.fill,
                   // height: windowsSize.height * 0.75,
                   // width: windowsSize.width,
