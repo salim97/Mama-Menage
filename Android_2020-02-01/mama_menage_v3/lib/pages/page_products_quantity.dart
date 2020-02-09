@@ -112,7 +112,7 @@ class _Page_Products_QuantityState extends State<Page_Products_Quantity> {
                           myAppState.notifyListeners();
                         },
                       ),
-                      Text("All", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      Text("Tout", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                       Expanded(
                         child: Container(),
                       ),

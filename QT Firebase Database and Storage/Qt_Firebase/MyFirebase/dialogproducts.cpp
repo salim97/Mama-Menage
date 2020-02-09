@@ -100,6 +100,15 @@ QNetworkReply::NetworkError DialogProducts::uploadProducts(QList<Row_Product> pr
 
         waitForDataToBeWriten->exec() ;
         qDebug() << "END UPLOADING DATA" ;
+        QJsonObject json;
+        json = myFirebaseManager->getChild(PATH_PRODUCTS);
+        replayProducts.clear();
+        foreach(const QString& key, json.keys()) {
+            QJsonValue value = json.value(key);
+            Row_Product row_Product ;
+            row_Product.fromJSON(value.toObject());
+            replayProducts.append(row_Product);
+        }
         bool dataNotFound = true ;
         foreach (Row_Product p, replayProducts) {
             if(products[i].getUniqID() == p.getUniqID())
@@ -218,6 +227,15 @@ QNetworkReply::NetworkError DialogProducts::syncProducts(QList<Row_Product> prod
         waitForDataToBeWriten->exec() ;
         qDebug() << "END UPLOADING DATA" ;
         bool dataNotFound = true ;
+        QJsonObject json;
+        json = myFirebaseManager->getChild(PATH_PRODUCTS);
+        replayProducts.clear();
+        foreach(const QString& key, json.keys()) {
+            QJsonValue value = json.value(key);
+            Row_Product row_Product ;
+            row_Product.fromJSON(value.toObject());
+            replayProducts.append(row_Product);
+        }
         foreach (Row_Product p, replayProducts) {
             if(products[i].getUniqID() == p.getUniqID())
             {
@@ -261,16 +279,5 @@ void DialogProducts::onError(QNetworkReply::NetworkError networkError)
 
 void DialogProducts::onDataIsReady()
 {
-
-    QJsonObject json;
-
-    json = myFirebaseManager->getChild(PATH_PRODUCTS);
-    replayProducts.clear();
-    foreach(const QString& key, json.keys()) {
-        QJsonValue value = json.value(key);
-        Row_Product row_Product ;
-        row_Product.fromJSON(value.toObject());
-        replayProducts.append(row_Product);
-    }
     waitForDataToBeWriten->quit();
 }

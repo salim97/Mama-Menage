@@ -10,9 +10,7 @@ import 'package:mama_menage_v3/providers/my_app_state.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as w;
-import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
+import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -34,67 +32,33 @@ class _Page_ValidationState extends State<Page_Validation> {
 
     myAppState = Provider.of<MyAppState>(context, listen: false);
     if (myAppState.currentFacture != null) {
-      String textOutput = "";
-      textOutput += "Commande numero " + myAppState.currentFacture.createdAt + " \n";
-      if (myAppState.user.isPriceVisible) {
-        myAppState.currentFacture.products?.forEach((p) {
-          textOutput += "\nproduct name = " + p.name;
-          textOutput += "\nproduct cost = " + p.cost.toString();
-          textOutput += "\nproduct quantity = " + p.quantity.toString();
-          textOutput += "\nproduct total price = " + p.total.toString();
-          textOutput += "\n-----------------------------------------";
-        });
-        textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
-      }
-
-      _textEditingController.text = textOutput;
-          onHTMLtoPDF();
+      onHTMLtoPDF();
       return;
     }
-
-
-    //     Future.delayed(Duration(seconds: 1)).then((_) async {
-    //   myAppState.flushbar(context: context, message: "facture was send with seccuss", color: Colors.green);
-    //   //readProducts();
-    // });
-
-    // String textOutput = "";
-    // textOutput += "Commande numero XX \n";
-    // if (myAppState.user.isPriceVisible) {
-    //   myAppState.selectedProducts?.forEach((p) {
-    //     if (p.checked) {
-    //       textOutput += "\nproduct name = " + p.name;
-    //       textOutput += "\nproduct cost = " + p.cost.toString();
-    //       textOutput += "\nproduct quantity = " + p.quantity.toString();
-    //       textOutput += "\nproduct total price = " + p.total.toString();
-    //       textOutput += "\n-----------------------------------------";
-    //     }
-    //   });
-    //   textOutput += "total facture is " + myAppState.totalCostSelectedProducts.toString();
-    // }
-
-    // _textEditingController.text = textOutput;
   }
 
   onHTMLtoPDF() async {
     await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    // Directory tempDir = await getApplicationDocumentsDirectory();
+    Directory tempDir = await getApplicationDocumentsDirectory();
     // Directory tempDir = await getDownloadsDirectory();
-    Directory tempDir = await getTemporaryDirectory();
-      print(myAppState.currentFactureToHTML()) ;
+    // Directory tempDir = await getTemporaryDirectory();
 
     var targetPath = tempDir.path;
-    var targetFileName = "example_pdf_file";
-    File generatedPdfFile =
-        await FlutterHtmlToPdf.convertFromHtmlContent(myAppState.currentFactureToHTML(), targetPath, targetFileName);
+    var targetFileName = "example_pdf_file5";
+
+    String htmlContent = myAppState.currentFactureToHTML();
+
+    var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(htmlContent, targetPath, targetFileName);
+
     setState(() {
-    _pdf_path = targetPath + '/example_pdf_file.pdf';
-    print(_pdf_path) ;
+      _pdf_path = generatedPdfFile.path;
+      print(_pdf_path);
     });
+
+// document =  await PDFDocument.fromFile(generatedPdfFile);
   }
 
   onPDF() async {
-    
     await onHTMLtoPDF();
     OpenFile.open(_pdf_path);
   }
@@ -128,11 +92,10 @@ class _Page_ValidationState extends State<Page_Validation> {
           if (selected == null) return;
           if (!selected.contains("@")) return;
 
-
           final Email email = Email(
             recipients: [selected],
             body: "",
-            subject: 'Commande '+myAppState.currentFacture.createdAt,
+            subject: 'Commande ' + myAppState.currentFacture.createdAt,
             attachmentPath: _pdf_path,
             isHTML: false,
           );
@@ -142,6 +105,7 @@ class _Page_ValidationState extends State<Page_Validation> {
   }
 
   String _pdf_path = "";
+  //  PDFDocument document ;
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
@@ -162,9 +126,10 @@ class _Page_ValidationState extends State<Page_Validation> {
             children: <Widget>[
               Expanded(
                   child: _pdf_path.isEmpty
-                      ? Container()
-                      : PdfViewer(
+                      ? Center(child: CircularProgressIndicator())
+                      : PdfDocumentLoader(
                           filePath: _pdf_path,
+                          backgroundFill: true
                         )),
               Row(
                 children: <Widget>[

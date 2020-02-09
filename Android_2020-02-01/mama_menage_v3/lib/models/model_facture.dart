@@ -17,7 +17,7 @@ class ModelFacture {
     tmp.valid = json['valid'] as bool;
     tmp.client = ModelClient.fromJson(json['client']);
     tmp.user = ModelUser.fromJson(json['user']);
-tmp.products= new List<ModelProduct>();
+    tmp.products= new List<ModelProduct>();
     List<dynamic> mapResponse = json['products'];
     mapResponse?.forEach((key) async {
         Map<dynamic, dynamic> j = key;

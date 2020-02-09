@@ -37,6 +37,7 @@ class ModelProduct {
     tmp.detail = json['detail'] as String;
     tmp.createdAt = json['createdAt'] as String;
     tmp.quantity = json['quantite'] as num;
+    // if( tmp.quantity == 0 ) return null ;
     tmp.cost = json['price'] as num;
     List<dynamic> a = json['image_remote_path'];
     if( a == null ) return null ;
