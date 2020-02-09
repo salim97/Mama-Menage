@@ -129,8 +129,8 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
   Widget body() {
     final drawerWidth = windowsSize.width * 0.25;
     final landscape = windowsSize.width > windowsSize.height ? true : false;
-    final double itemHeight = (windowsSize.height - kToolbarHeight - (landscape ? 60 : 150)) / 2;
-    final double itemWidth = (windowsSize.width - drawerWidth) / 2;
+    final double itemHeight = (windowsSize.height - kToolbarHeight - (landscape ? 60 : 150)) / 3;
+    final double itemWidth = (windowsSize.width - drawerWidth) / 3;
 
     return SmartRefresher(
       controller: _refreshController,
@@ -161,13 +161,14 @@ class _Page_AllProdutcsState extends State<Page_AllProdutcs> {
         children: <Widget>[
           Expanded(
             child: Container(
+              height: 300,
               child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: landscape ? myAppState.landscape_count : myAppState.portrait_count,
-                      childAspectRatio: 1.0),
-                  padding: const EdgeInsets.all(4.0),
+                
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.7),
+                  padding: const EdgeInsets.only(bottom: 90.0, top: 90.0),
+                   scrollDirection: Axis.horizontal,
                   itemCount: _products.length,
-                  controller: new ScrollController(keepScrollOffset: false),
+                  controller: new ScrollController(keepScrollOffset: true),
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
                     return CardItems(index: index);

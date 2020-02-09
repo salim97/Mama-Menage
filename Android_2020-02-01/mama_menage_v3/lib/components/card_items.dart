@@ -44,6 +44,7 @@ class _CardItemsState extends State<CardItems> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
+          
           decoration: BoxDecoration(
             border: Border.all(
               width: 3, //                   <--- border width here
@@ -51,6 +52,7 @@ class _CardItemsState extends State<CardItems> {
             ),
           ),
           child: Stack(
+            
             children: <Widget>[
               Positioned(
                 top: 0,
@@ -81,8 +83,7 @@ class _CardItemsState extends State<CardItems> {
                         },
                           useDiskCache: true,
                           cacheRule: CacheRule(maxAge: const Duration(days: 7)),
-                          timeoutDuration: const Duration(seconds: 1),
-                          retryLimit: 1),
+                         ),
                   fit: BoxFit.fill,
                   // height: windowsSize.height * 0.75,
                   // width: windowsSize.width,
