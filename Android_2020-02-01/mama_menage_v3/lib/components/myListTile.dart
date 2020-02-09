@@ -131,9 +131,14 @@ class _MyListTileState extends State<MyListTile> {
                         SizedBox(
                           width: SPACE_ROW_QUANTITY,
                         ),
-                        Text(
-                          product.selectedQuantity.toString(),
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                       GestureDetector(
+      onTap: () async {
+        
+      },
+                                                  child: Text(
+                            product.selectedQuantity.toString(),
+                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
                         SizedBox(
                           width: SPACE_ROW_QUANTITY,

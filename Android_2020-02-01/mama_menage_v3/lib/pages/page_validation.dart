@@ -44,7 +44,8 @@ class _Page_ValidationState extends State<Page_Validation> {
     // Directory tempDir = await getDownloadsDirectory();
     Directory tempDir = await getTemporaryDirectory();
 
-    var targetPath = tempDir.path;
+    // var targetPath = tempDir.path;
+    var targetPath = "/storage/emulated/0/documents";
     var targetFileName = "example_pdf_file7";
 
     String htmlContent = myAppState.currentFactureToHTML();
