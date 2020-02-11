@@ -35,6 +35,7 @@ class _CardItemsState extends State<CardItems> {
     myAppState = Provider.of<MyAppState>(context);
     windowsSize = MediaQuery.of(context).size;
     return GestureDetector(
+     
       onTap: () async {
         product.selectedQP = product.qp.first;
         product.selectedProduct = !product.selectedProduct;
@@ -44,7 +45,7 @@ class _CardItemsState extends State<CardItems> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          
+         
           decoration: BoxDecoration(
             border: Border.all(
               width: 3, //                   <--- border width here
@@ -52,9 +53,10 @@ class _CardItemsState extends State<CardItems> {
             ),
           ),
           child: Stack(
-            
+           
             children: <Widget>[
               Positioned(
+                
                 top: 0,
                 left: 0,
                 right: 0,
@@ -62,9 +64,11 @@ class _CardItemsState extends State<CardItems> {
                 // bottom: windowsSize.height * 0.15,
                 // height: windowsSize.height * 0.75,
                 child: Image(
+                
                   image: DEV_MODE
                       ? AssetImage(product.imagePath.first)
                       : AdvancedNetworkImage(product.imagePath.first,
+                       
                           // header: header,
                           loadedCallback: () {
                           print(product.imagePath.first);
@@ -102,7 +106,14 @@ class _CardItemsState extends State<CardItems> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           product.name,
-                          style: TextStyle(fontSize: 16.0),
+                          style: TextStyle(fontSize: 16.0,),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          product.category,
+                          style: TextStyle(fontSize: 16.0,),
                         ),
                       ),
                       Align(

@@ -40,18 +40,20 @@ class _Page_ValidationState extends State<Page_Validation> {
 
   onHTMLtoPDF() async {
     await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    
     // Directory tempDir = await getApplicationDocumentsDirectory();
     // Directory tempDir = await getDownloadsDirectory();
     Directory tempDir = await getTemporaryDirectory();
 
-    // var targetPath = tempDir.path;
-    var targetPath = "/storage/emulated/0/documents";
+    var targetPath = tempDir.path;
+    // var targetPath = "/storage/emulated/0/documents";
     var targetFileName = "example_pdf_file7";
 
     String htmlContent = myAppState.currentFactureToHTML();
 
     var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(htmlContent, targetPath, targetFileName);
 
+    
     setState(() {
       _pdf_path = generatedPdfFile.path;
       print(_pdf_path);

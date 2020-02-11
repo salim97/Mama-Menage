@@ -12,12 +12,14 @@ class ModelProduct {
   int quantity;
   String detail;
   String createdAt;
+  
 
   //local
   int selectedQuantity = 1;
   int selectedQP = null ;
   bool checked;
   bool selectedProduct = false ;
+  
   get total => quantity * cost;
 
   ModelProduct({

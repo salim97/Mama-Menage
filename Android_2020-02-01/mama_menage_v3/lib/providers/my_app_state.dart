@@ -373,12 +373,12 @@ class MyAppState extends ChangeNotifier {
 """ + tableBody +"""
             </tbody>
         </table>
-        <div style="position: absolute; bottom: """+(19 - currentFacture.products.length).toString()+"""cm; left: 1cm;word-wrap: break-word;width: 50%;">
+        <div style="position: absolute; bottom: """+(18 - currentFacture.products.length).toString()+"""cm; left: 1cm;word-wrap: break-word;width: 50%;">
             <p>Cette facture est arretee au montant :</p>
             <p><b>{{totalLetters}}</b></p>
             <p>Mode de paiment : <b>{{paimentMode}}</b></p>
         </div>
-        <table style="position: absolute; bottom: """+(15 - currentFacture.products.length).toString()+"""cm; right: 1cm; border-collapse: collapse;border: 1px solid black; background-color: #f2f2f2">
+        <table style="position: absolute; bottom: """+(14 - currentFacture.products.length).toString()+"""cm; right: 1cm; border-collapse: collapse;border: 1px solid black; background-color: #f2f2f2">
             <tr>
                 <td style="text-align:left;width:37.84mm; ">
                     <p><b>HORS TAXE (DA): </b></p>
@@ -484,18 +484,18 @@ return htmlContent;
     }
   }
 
-  int landscape_count = 4;
-  int portrait_count = 3;
+  int landscape_count = 1;
+  // int portrait_count = 3;
   loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    landscape_count = (prefs.getInt('landscape_count') ?? 4);
-    portrait_count = (prefs.getInt('portrait_count') ?? 3);
+    landscape_count = (prefs.getInt('landscape_count') ?? 1);
+    // portrait_count = (prefs.getInt('portrait_count') ?? 3);
   }
 
   saveSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt('landscape_count', landscape_count);
-    prefs.setInt('portrait_count', portrait_count);
+    // prefs.setInt('portrait_count', portrait_count);
   }
 }
 
