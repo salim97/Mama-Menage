@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             //app-specific localization
             EasyLocalizationDelegate(
-              locale: data.savedLocale,
+              locale: data.locale,
               path: 'lang',
               //useOnlyLangCode: true,
               // loadPath: 'https://raw.githubusercontent.com/aissat/easy_localization/master/example/resources/langs'

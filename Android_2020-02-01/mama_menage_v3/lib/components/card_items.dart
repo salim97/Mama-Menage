@@ -1,3 +1,4 @@
+import 'package:cache_image/cache_image.dart';
 import 'package:fleva_icons/fleva_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,116 +31,95 @@ class _CardItemsState extends State<CardItems> {
             )));
   }
 
+//  onTap: () async {
+//           product.selectedQP = product.qp.first;
+//           product.selectedProduct = !product.selectedProduct;
+//           myAppState.notifyListeners();
+//         },
+//         onLongPress: onDetails,
   @override
   Widget build(BuildContext context) {
     myAppState = Provider.of<MyAppState>(context);
     windowsSize = MediaQuery.of(context).size;
-    return GestureDetector(
-     
-      onTap: () async {
-        product.selectedQP = product.qp.first;
-        product.selectedProduct = !product.selectedProduct;
-        myAppState.notifyListeners();
-      },
-      onLongPress: onDetails,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
+    return Padding(
+      padding: const EdgeInsets.only(bottom:60.0, left: 30.0, right: 30.0),
+      child: Container(
+       
+        // decoration: BoxDecoration(
+        //   border: Border.all(
+        //     width: 3, //                   <--- border width here
+        //     color: product.selectedProduct ? Colors.red : Colors.transparent,
+        //   ),
+        // ),
+        child: Stack(
          
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3, //                   <--- border width here
-              color: product.selectedProduct ? Colors.red : Colors.transparent,
-            ),
-          ),
-          child: Stack(
-           
-            children: <Widget>[
-              Positioned(
-                
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                // bottom: windowsSize.height * 0.15,
+          children: <Widget>[
+            Positioned(
+              
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              // bottom: windowsSize.height * 0.15,
+              // height: windowsSize.height * 0.75,
+              child: Image(
+              
+                image: DEV_MODE
+                    ? AssetImage(product.imagePath.first)
+                    : CacheImage(
+                      product.imagePath.first,
+                       duration: Duration(seconds: 2), durationExpiration: Duration(seconds: 2)),
+
+                    // AdvancedNetworkImage(
+                    //   product.imagePath.first,
+                    //     // header: header,
+                    //     loadedCallback: () {
+                    //     print(product.imagePath.first);
+                    //     print('It works!');
+                    //   }, loadFailedCallback: () {
+                    //     print(product.imagePath.first);
+                    //     print('Oh, no!');
+                    //     product.imagePath[0] = BLACK_IMAGE;
+                    //     myAppState.notifyListeners();
+                    //   },
+                    //     // loadingProgress: (progress, list) {
+                    //     //   print('Now Loading: $progress');
+                    //     // },
+                    //     loadedFromDiskCacheCallback: () {
+                    //     print('Now loadedFromDiskCacheCallback: ');
+                    //   },
+                    //     useDiskCache: true,
+                    //     cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                    //    ),
+                fit: BoxFit.fill,
                 // height: windowsSize.height * 0.75,
-                child: Image(
-                
-                  image: DEV_MODE
-                      ? AssetImage(product.imagePath.first)
-                      : AdvancedNetworkImage(product.imagePath.first,
-                       
-                          // header: header,
-                          loadedCallback: () {
-                          print(product.imagePath.first);
-                          print('It works!');
-                        }, loadFailedCallback: () {
-                          print(product.imagePath.first);
-                          print('Oh, no!');
-                          product.imagePath[0] = BLACK_IMAGE;
-                          myAppState.notifyListeners();
-                        },
-                          // loadingProgress: (progress, list) {
-                          //   print('Now Loading: $progress');
-                          // },
-                          loadedFromDiskCacheCallback: () {
-                          print('Now loadedFromDiskCacheCallback: ');
-                        },
-                          useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 7)),
-                         ),
-                  fit: BoxFit.fill,
-                  // height: windowsSize.height * 0.75,
-                  // width: windowsSize.width,
+                // width: windowsSize.width,
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              // height: windowsSize.height * 0.15,
+              child: Container(
+                decoration: BoxDecoration(color: Colors.white),
+                child: Column(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        product.name,
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    
+                   
+                  ],
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                // height: windowsSize.height * 0.15,
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.white),
-                  child: Column(
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          product.name,
-                          style: TextStyle(fontSize: 16.0,),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          product.category,
-                          style: TextStyle(fontSize: 16.0,),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          product.cost.toString() + " DA",
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: Colors.black,
-                  ),
-                  onPressed: onDetails,
-                ),
-              )
-            ],
-          ),
+            ),
+           
+          ],
         ),
       ),
     );

@@ -164,4 +164,7 @@ class _Page_Products_DetailsState extends State<Page_Products_Details> {
     });
     return images;
   }
+
+
 }
+

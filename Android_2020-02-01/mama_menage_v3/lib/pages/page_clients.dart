@@ -3,8 +3,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_input_border/gradient_input_border.dart';
+import 'package:mama_menage_v3/components/clientAvatar.dart';
 import 'package:mama_menage_v3/models/model_client.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -42,18 +44,21 @@ class _Page_ClientsState extends State<Page_Clients> {
   }
 
   onRefresh() async {
-    if (myAppState.database == null) await myAppState.signInAnonymously();
+    //  if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllClients();
+
     if (!mounted) {
       // dispose();
       return;
     }
+
     setState(() {
       _listData.clear();
       myAppState.clients.forEach((p) => _listData.add(p));
     });
   }
 
+  bool _visibile_btn_filter = true;
   @override
   Widget build(BuildContext context) {
     windowsSize = MediaQuery.of(context).size;
@@ -64,9 +69,29 @@ class _Page_ClientsState extends State<Page_Clients> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
+          Positioned(right: 0, top: 0, left: 0, bottom: 0, child: body()),
           Positioned(
-              right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
-          Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
+            top: 0,
+            right: 0,
+            child: _visibile_btn_filter ? Container() : filterPage(),
+          ),
+          Positioned(
+            top: windowsSize.height * 0.02,
+            right: windowsSize.width * 0.02,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _visibile_btn_filter = !_visibile_btn_filter;
+                });
+              },
+              child: Icon(
+                MdiIcons.tune,
+                color: _visibile_btn_filter ? Colors.black : Colors.white,
+              ),
+              backgroundColor: _visibile_btn_filter ? Colors.white : Colors.black,
+              mini: true,
+            ),
+          ),
         ],
       ),
     );
@@ -82,45 +107,68 @@ class _Page_ClientsState extends State<Page_Clients> {
         loadStyle: LoadStyle.ShowAlways,
         completeDuration: Duration(milliseconds: 500),
       ),
-      header: WaterDropHeader(),
+      header: ClassicHeader(
+        // loadStyle: LoadStyle.ShowAlways,
+        completeDuration: Duration(milliseconds: 500),
+      ),
+      //WaterDropHeader(),
       onRefresh: () async {
         //monitor fetch data from network
         await onRefresh();
         _refreshController.refreshCompleted();
       },
-      // onLoading: () async {
-      //   //monitor fetch data from network
-      //   print("-----------------------------");
-      //   print("onLoading: () async {");
 
-      //   //if (mounted) setState(() {});
-      //   //_refreshController.loadFailed();
-      //   _refreshController.refreshCompleted();
-      // },
-      child: ListView.builder(
-        itemCount: _listData.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(_listData.elementAt(index).name),
-            subtitle: Text(_listData.elementAt(index).address),
-            leading: CircleAvatar(
-              backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
-              child: Text(
-                _listData.elementAt(index).name[0].toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            onTap: () {
-              myAppState.products.forEach((p) => p.selectedProduct = false);
-              myAppState.client = _listData.elementAt(index);
-              myAppState.notifyListeners();
-              myAppState.goNextTab();
-              // Navigator.of(context)
-              //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
-            },
-          );
-        },
+      child: Container(
+        child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 1.0),
+            // padding: const EdgeInsets.only(bottom: 90.0, top: 90.0),
+            scrollDirection: Axis.horizontal,
+            itemCount: _listData.length,
+            controller: new ScrollController(keepScrollOffset: true),
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              return ClientAvatar(
+                client: _listData.elementAt(index),
+                onTap: () {
+                  print("zaezaeaz");
+                  myAppState.clients.forEach((p) {
+                    if (p == _listData.elementAt(index)) {
+                      if (myAppState.client == p)
+                        myAppState.client = null;
+                      else
+                        myAppState.client = p;
+                      myAppState.notifyListeners();
+                    }
+                  });
+                },
+              );
+            }),
       ),
+
+      //             ListView.builder(
+      //   itemCount: _listData.length,
+      //   itemBuilder: (BuildContext context, int index) {
+      //     return ListTile(
+      //       title: Text(_listData.elementAt(index).name),
+      //       subtitle: Text(_listData.elementAt(index).address),
+      //       leading: CircleAvatar(
+      //         backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
+      //         child: Text(
+      //           _listData.elementAt(index).name[0].toUpperCase(),
+      //           style: TextStyle(color: Colors.white),
+      //         ),
+      //       ),
+      //       onTap: () {
+      //         myAppState.products.forEach((p) => p.selectedProduct = false);
+      //         myAppState.client = _listData.elementAt(index);
+      //         myAppState.notifyListeners();
+      //         myAppState.goNextTab();
+      //         // Navigator.of(context)
+      //         //     .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_AllProdutcs()));
+      //       },
+      //     );
+      //   },
+      // ),
     );
   }
 
@@ -214,80 +262,90 @@ class _Page_ClientsState extends State<Page_Clients> {
   }
 
   Widget filterPage() {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Column(
-            children: <Widget>[
-
-              Divider(),
-              Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new TextFormField(
-                    style: new TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: GradientOutlineInputBorder(
-                          focusedGradient: myGradient,
-                          unfocusedGradient: myGradient,
-                        ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
-                        suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                c_name.text = "";
-                              });
-                              onApplyFilter();
-                            })),
-                    keyboardType: TextInputType.text,
-                    controller: c_name,
-                    onChanged: (query) {
-                      onApplyFilter();
-                    },
-                  )),
-              Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new TextFormField(
-                    style: new TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: GradientOutlineInputBorder(
-                          focusedGradient: myGradient,
-                          unfocusedGradient: myGradient,
-                        ),
-                        labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
-                        suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                c_address.text = "";
-                              });
-                              onApplyFilter();
-                            })),
-                    keyboardType: TextInputType.text,
-                    controller: c_address,
-                    onChanged: (query) {
-                      onApplyFilter();
-                    },
-                  )),
-              Divider(),
-              Align(
-                alignment: Alignment.center,
-                child: Text("Plus de filtres"),
-              ),
-              RaisedButton.icon(
-                label: Text(
-                  AppLocalizations.of(context).tr("drawer_btn_sort"),
-                ),
-                icon: Icon(Icons.sort),
-                onPressed: onSort,
-              ),
-            ],
+    return Container(
+      height: windowsSize.height * 0.90,
+      width: windowsSize.width * 0.20,
+      decoration: BoxDecoration(color: Colors.white),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: windowsSize.height * 0.04,
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.only(left: 18.0),
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Filtrer par :",
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                )),
+          ),
+          SizedBox(
+            height: windowsSize.height * 0.04,
+          ),
+          Divider(),
+          Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new TextFormField(
+                style: new TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                    border: GradientOutlineInputBorder(
+                      focusedGradient: myGradient,
+                      unfocusedGradient: myGradient,
+                    ),
+                    labelText: AppLocalizations.of(context).tr("drawer_filter_name"),
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            c_name.text = "";
+                          });
+                          onApplyFilter();
+                        })),
+                keyboardType: TextInputType.text,
+                controller: c_name,
+                onChanged: (query) {
+                  onApplyFilter();
+                },
+              )),
+          Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new TextFormField(
+                style: new TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                    border: GradientOutlineInputBorder(
+                      focusedGradient: myGradient,
+                      unfocusedGradient: myGradient,
+                    ),
+                    labelText: AppLocalizations.of(context).tr("drawer_filter_address"),
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            c_address.text = "";
+                          });
+                          onApplyFilter();
+                        })),
+                keyboardType: TextInputType.text,
+                controller: c_address,
+                onChanged: (query) {
+                  onApplyFilter();
+                },
+              )),
+          Divider(),
+          Align(
+            alignment: Alignment.center,
+            child: Text("Plus de filtres"),
+          ),
+          RaisedButton.icon(
+            label: Text(
+              AppLocalizations.of(context).tr("drawer_btn_sort"),
+            ),
+            icon: Icon(Icons.sort),
+            onPressed: onSort,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -12,15 +12,15 @@ class ModelProduct {
   int quantity;
   String detail;
   String createdAt;
-  
 
   //local
   int selectedQuantity = 1;
-  int selectedQP = null ;
+  int selectedQP = null;
   bool checked;
-  bool selectedProduct = false ;
-  
+  bool selectedProduct = false;
+
   get total => quantity * cost;
+  get total_per_selectedQuantity => selectedQuantity * cost;
 
   ModelProduct({
     this.name,
@@ -42,19 +42,21 @@ class ModelProduct {
     // if( tmp.quantity == 0 ) return null ;
     tmp.cost = json['price'] as num;
     List<dynamic> a = json['image_remote_path'];
-    if( a == null ) return null ;
-    tmp.imagePath = new List<String>();
-    a.forEach((e) {
-      tmp.imagePath.add(e);
-    });
+    if (a != null) {
+      tmp.imagePath = new List<String>();
+      a.forEach((e) {
+        tmp.imagePath.add(e);
+      });
+    }
 
     List<dynamic> b = json['qp'];
-    if( b == null ) return null ;
-    tmp.qp = new List<int>();
-    b.forEach((e) {
-      tmp.qp.add(e);
-    });
-    
+    if (b != null) {
+      tmp.qp = new List<int>();
+      b.forEach((e) {
+        tmp.qp.add(e);
+      });
+    }
+
     return tmp;
     // return ModelProduct()
     //   ..name = json['name'] as String
@@ -63,17 +65,33 @@ class ModelProduct {
     //   ..imagePath = json['image_remote_path'] as List<dynamic>;
   }
 
-   Map<String, dynamic> toJson() =>
-    {
+  Map<String, dynamic> toJson() => {
+        'code': code,
+        'name': name,
+        'mark': mark,
+        'category': category,
+        'detail': detail,
+        'createdAt': createdAt,
+        'quantite': selectedQuantity,
+        'selectedQP': selectedQP,
+        'price': cost,
+        'total': total
+      };
+  Map<String, dynamic> saveSettings() {
+    Map<String, dynamic> tmp = {
       'code': code,
       'name': name,
       'mark': mark,
       'category': category,
       'detail': detail,
       'createdAt': createdAt,
-      'quantite': selectedQuantity,
+      'quantite': quantity,
       'selectedQP': selectedQP,
       'price': cost,
+      'image_remote_path': imagePath,
+      'qp': qp,
       'total': total
     };
+    return tmp;
+  }
 }

@@ -33,7 +33,7 @@ class _Page_ValidationState extends State<Page_Validation> {
 
     myAppState = Provider.of<MyAppState>(context, listen: false);
     if (myAppState.currentFacture != null) {
-      onHTMLtoPDF();
+      // onHTMLtoPDF();
       return;
     }
   }
@@ -68,6 +68,7 @@ class _Page_ValidationState extends State<Page_Validation> {
   }
 
   onGMAIL() async {
+    await onHTMLtoPDF();
     await myAppState.getAllEmails();
     List<Widget> m_actions = new List<Widget>();
     for (int i = 0; i < myAppState.admin_emails.length; i++)

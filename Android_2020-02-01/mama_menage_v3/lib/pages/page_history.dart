@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_input_border/gradient_input_border.dart';
+import 'package:mama_menage_v3/components/historiqueItem.dart';
 import 'package:mama_menage_v3/models/model_facture.dart';
 import 'package:mama_menage_v3/providers/my_app_state.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -41,7 +43,7 @@ class _Page_HistoryState extends State<Page_History> {
   onRefresh() async {
     myAppState.currentFacture = null;
     myAppState.notifyListeners();
-    if (myAppState.database == null) await myAppState.signInAnonymously();
+    // if (myAppState.database == null) await myAppState.signInAnonymously();
     await myAppState.getAllCommandes();
     if (!mounted) {
       // dispose();
@@ -50,11 +52,22 @@ class _Page_HistoryState extends State<Page_History> {
     setState(() {
       _listData.clear();
       myAppState.factures.forEach((p) {
-        if (p.user.name == myAppState.user.name) _listData.add(p);
+
+        if (p.user.name == myAppState.user.name)
+        {
+        _listData.add(p);
+          if(_listData.last.toSYNC)
+          {
+            print("YEEEEEEEEEEEEEEEEEEEEESSS");
+          }
+        }
       });
+      _listData.sort((b, a) => a.toSYNC.toString().compareTo(b.toSYNC.toString() ));
+      
     });
   }
 
+  bool _visibile_btn_filter = true;
   @override
   Widget build(BuildContext context) {
     windowsSize = MediaQuery.of(context).size;
@@ -65,9 +78,29 @@ class _Page_HistoryState extends State<Page_History> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
+          Positioned(right: 0, top: 0, left: 0, bottom: 0, child: body()),
           Positioned(
-              right: 0, top: 0, width: windowsSize.width - drawerWidth, height: windowsSize.height, child: body()),
-          Positioned(top: 0, left: 0, width: drawerWidth, height: windowsSize.height, child: filterPage())
+            top: 0,
+            right: 0,
+            child: _visibile_btn_filter ? Container() : filterPage(),
+          ),
+          Positioned(
+            top: windowsSize.height * 0.02,
+            right: windowsSize.width * 0.02,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _visibile_btn_filter = !_visibile_btn_filter;
+                });
+              },
+              child: Icon(
+                MdiIcons.tune,
+                color: _visibile_btn_filter ? Colors.black : Colors.white,
+              ),
+              backgroundColor: _visibile_btn_filter ? Colors.white : Colors.black,
+              mini: true,
+            ),
+          ),
         ],
       ),
     );
@@ -76,6 +109,11 @@ class _Page_HistoryState extends State<Page_History> {
   RefreshController _refreshController = RefreshController(initialRefresh: true);
 
   Widget body() {
+    var size = MediaQuery.of(context).size;
+
+    /*24 is for notification bar on Android*/
+    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
+    final double itemWidth = size.width * 2;
     return SmartRefresher(
       controller: _refreshController,
       enablePullUp: true,
@@ -89,40 +127,27 @@ class _Page_HistoryState extends State<Page_History> {
         await onRefresh();
         _refreshController.refreshCompleted();
       },
-      // onLoading: () async {
-      //   //monitor fetch data from network
-      //   print("-----------------------------");
-      //   print("onLoading: () async {");
+      child: Container(
+        child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.5),
+            // padding: const EdgeInsets.only(bottom: 90.0, top: 90.0),
 
-      //   //if (mounted) setState(() {});
-      //   //_refreshController.loadFailed();
-      //   _refreshController.refreshCompleted();
-      // },
-      child: ListView.builder(
-        itemCount: _listData.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(_listData.elementAt(index).createdAt +
-                " ( " +
-                new DateTime.fromMillisecondsSinceEpoch(int.parse(_listData.elementAt(index).createdAt)).toString() +
-                " ) "),
-            subtitle: Text(_listData.elementAt(index).client.name + " " + _listData.elementAt(index).user.name),
-            leading: CircleAvatar(
-              backgroundColor: Color.fromRGBO(104, 193, 139, 1.0),
-              child: Text(
-                _listData.elementAt(index).client.name[0].toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            onTap: () {
-              myAppState.currentFacture = _listData.elementAt(index);
-              myAppState.notifyListeners();
-              Navigator.of(context)
-                  .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Validation()));
-              // TODO: open validation mode
-            },
-          );
-        },
+            scrollDirection: Axis.horizontal,
+            itemCount: _listData.length,
+            controller: new ScrollController(keepScrollOffset: true),
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+
+              return HistoriqueItem(
+                facture: _listData.elementAt(index),
+                onTap: () {
+                  myAppState.currentFacture = _listData.elementAt(index);
+                  myAppState.notifyListeners();
+                  Navigator.of(context)
+                      .push(new MaterialPageRoute(builder: (BuildContext context) => new Page_Validation()));
+                },
+              );
+            }),
       ),
     );
   }
@@ -205,78 +230,90 @@ class _Page_HistoryState extends State<Page_History> {
   }
 
   Widget filterPage() {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new TextFormField(
-                    style: new TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: GradientOutlineInputBorder(
-                          focusedGradient: myGradient,
-                          unfocusedGradient: myGradient,
-                        ),
-                        labelText: "Nom de Client",
-                        suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                c_nom_de_client.text = "";
-                              });
-                              onApplyFilter();
-                            })),
-                    keyboardType: TextInputType.text,
-                    controller: c_nom_de_client,
-                    onChanged: (query) {
-                      onApplyFilter();
-                    },
-                  )),
-              Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new TextFormField(
-                    style: new TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        border: GradientOutlineInputBorder(
-                          focusedGradient: myGradient,
-                          unfocusedGradient: myGradient,
-                        ),
-                        labelText: "Date Heure",
-                        suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                c_datetime.text = "";
-                              });
-                              onApplyFilter();
-                            })),
-                    keyboardType: TextInputType.datetime,
-                    controller: c_datetime,
-                    onChanged: (query) {
-                      onApplyFilter();
-                    },
-                  )),
-              Divider(),
-              Align(
-                alignment: Alignment.center,
-                child: Text("Plus de filtres"),
-              ),
-              RaisedButton.icon(
-                label: Text(
-                  AppLocalizations.of(context).tr("drawer_btn_sort"),
-                ),
-                icon: Icon(Icons.sort),
-                onPressed: onSort,
-              ),
-            ],
+    return Container(
+      height: windowsSize.height * 0.90,
+      width: windowsSize.width * 0.20,
+      decoration: BoxDecoration(color: Colors.white),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: windowsSize.height * 0.04,
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.only(left: 18.0),
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Filtrer par :",
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                )),
+          ),
+          SizedBox(
+            height: windowsSize.height * 0.04,
+          ),
+          Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new TextFormField(
+                style: new TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                    border: GradientOutlineInputBorder(
+                      focusedGradient: myGradient,
+                      unfocusedGradient: myGradient,
+                    ),
+                    labelText: "Nom de Client",
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            c_nom_de_client.text = "";
+                          });
+                          onApplyFilter();
+                        })),
+                keyboardType: TextInputType.text,
+                controller: c_nom_de_client,
+                onChanged: (query) {
+                  onApplyFilter();
+                },
+              )),
+          Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new TextFormField(
+                style: new TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                    border: GradientOutlineInputBorder(
+                      focusedGradient: myGradient,
+                      unfocusedGradient: myGradient,
+                    ),
+                    labelText: "Date Heure",
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            c_datetime.text = "";
+                          });
+                          onApplyFilter();
+                        })),
+                keyboardType: TextInputType.datetime,
+                controller: c_datetime,
+                onChanged: (query) {
+                  onApplyFilter();
+                },
+              )),
+              
+          Divider(),
+          Align(
+            alignment: Alignment.center,
+            child: Text("Plus de filtres"),
+          ),
+          RaisedButton.icon(
+            label: Text(
+              AppLocalizations.of(context).tr("drawer_btn_sort"),
+            ),
+            icon: Icon(Icons.sort),
+            onPressed: onSort,
+          ),
+        ],
+      ),
     );
   }
 }

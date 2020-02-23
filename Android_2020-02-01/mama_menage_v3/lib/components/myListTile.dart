@@ -53,23 +53,22 @@ class _MyListTileState extends State<MyListTile> {
                 // : Image.network(product.imagePath.first, fit: BoxFit.fill, height: height, width: height)
                 : Image(
                     image: AdvancedNetworkImage(
-                      
                       product.imagePath.first,
                       // header: header,
-                         loadedCallback: () {
-                          print( product.imagePath.first);
-                          print('It works!');
-                        },
-                        loadFailedCallback: () {
-                          print( product.imagePath.first);
-                          print('Oh, no!');
-                        },
-                        // loadingProgress: (progress, list) {
-                        //   print('Now Loading: $progress');
-                        // },
-                        loadedFromDiskCacheCallback: () {
-                          print('Now loadedFromDiskCacheCallback: ');
-                        },
+                      loadedCallback: () {
+                        print(product.imagePath.first);
+                        print('It works!');
+                      },
+                      loadFailedCallback: () {
+                        print(product.imagePath.first);
+                        print('Oh, no!');
+                      },
+                      // loadingProgress: (progress, list) {
+                      //   print('Now Loading: $progress');
+                      // },
+                      loadedFromDiskCacheCallback: () {
+                        print('Now loadedFromDiskCacheCallback: ');
+                      },
                       useDiskCache: true,
                       cacheRule: CacheRule(maxAge: const Duration(days: 7)),
                     ),
@@ -115,11 +114,10 @@ class _MyListTileState extends State<MyListTile> {
                           child: Container(),
                         ),
                         FloatingActionButton(
-                            backgroundColor:  Color.fromRGBO(57, 178, 186, 1.0),
-                          heroTag:null,
+                          backgroundColor: Color.fromRGBO(57, 178, 186, 1.0),
+                          heroTag: null,
                           mini: true,
                           child: Icon(MdiIcons.minus),
-                          
                           onPressed: () {
                             if (product.selectedQuantity > 1)
                               setState(() {
@@ -131,11 +129,43 @@ class _MyListTileState extends State<MyListTile> {
                         SizedBox(
                           width: SPACE_ROW_QUANTITY,
                         ),
-                       GestureDetector(
-      onTap: () async {
-        
-      },
-                                                  child: Text(
+                        GestureDetector(
+                          onTap: () async {
+                            var alert = AlertDialog(
+                              title: Text("De combien d'objets as-tu besoin?"),
+                              
+                              content: TextField(
+                                style: TextStyle(decoration: TextDecoration.none),
+                                maxLines: 1,
+                                maxLengthEnforced: false,
+                                autofocus: true,
+                                enabled: true,
+                                onSubmitted: (String text) {
+                                  int number_input = int.parse(text);
+                                  // Do something with your number like pass it to the next material page route
+                                  if(number_input > product.quantity)
+                                  {
+                                    myAppState.flushbar(context: context, message: "max quantity is " +product.quantity.toString() );
+                                    return ;
+                                  }
+                                  product.selectedQuantity = number_input ;
+                                  myAppState.notifyListeners();
+                                  Navigator.of(context).pop();
+                                },
+                                keyboardType: TextInputType.number,
+                                //controller: _controller,
+                               
+                              ),
+                            );
+
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return alert;
+                              },
+                            );
+                          },
+                          child: Text(
                             product.selectedQuantity.toString(),
                             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                           ),
@@ -144,7 +174,7 @@ class _MyListTileState extends State<MyListTile> {
                           width: SPACE_ROW_QUANTITY,
                         ),
                         FloatingActionButton(
-                          backgroundColor:  Color.fromRGBO(57, 178, 186, 1.0),
+                          backgroundColor: Color.fromRGBO(57, 178, 186, 1.0),
                           heroTag: null,
                           mini: true,
                           child: Icon(MdiIcons.plus),
@@ -158,6 +188,7 @@ class _MyListTileState extends State<MyListTile> {
                         ),
                       ],
                     )
+                  
                   ],
                 ),
               ),
